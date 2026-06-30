@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test d'intelligence narrative · ADIN</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a2e;--ink-soft:#4a4a6a;--ink-faint:#8888a8;
+  --cream:#f8f6f0;--cream-d:#ede8df;
+  --navy:#1e3a5f;--navy-mid:#2d5a8e;--navy-s:#dce8f5;
+  --accent:#c8432a;--accent-s:#fee2e2;
+  --green:#2d6a4f;--green-s:#d8ede4;
+  --gold:#c9a84c;--gold-s:#f0e6c8;
+  --r:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.6}
+
+/* ── ПРОГРЕСС ── */
+#progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--cream-d);z-index:100}
+#progress-fill{height:100%;background:linear-gradient(90deg,var(--navy-mid),var(--accent));
+  transition:width .4s ease;width:0}
+
+/* ── ЭКРАНЫ ── */
+.screen{display:none;min-height:100vh;padding:20px 16px 40px;
+  flex-direction:column;align-items:center}
+.screen.on{display:flex}
+
+/* ── ШАПКА ── */
+.top{width:100%;max-width:640px;display:flex;align-items:center;
+  gap:12px;padding-bottom:20px;border-bottom:1px solid var(--cream-d);margin-bottom:24px}
+.top img{height:40px}
+.top-txt{font-size:11px;color:var(--ink-faint);letter-spacing:.04em;line-height:1.4;
+  text-transform:uppercase}
+
+/* ── КАРТОЧКА ── */
+.card{background:#fff;border-radius:var(--r);
+  box-shadow:0 2px 16px rgba(26,26,46,.07);
+  padding:32px;width:100%;max-width:640px}
+@media(max-width:480px){.card{padding:20px}}
+
+/* ── ТИПОГРАФИКА ── */
+.label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:6px}
+h1{font-size:28px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:8px}
+h2{font-size:22px;font-weight:600;color:var(--ink);margin-bottom:12px}
+p{color:var(--ink-soft);font-size:15px}
+
+/* ── КНОПКИ ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;
+  border:none;border-radius:50px;font-size:15px;font-weight:500;cursor:pointer;
+  transition:all .18s;font-family:inherit;text-decoration:none}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--navy-mid);transform:translateY(-1px)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:2px solid var(--cream-d);color:var(--ink-soft)}
+.btn-ghost:hover:not(:disabled){border-color:var(--navy);color:var(--navy)}
+.btn-lg{padding:14px 32px;font-size:16px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-full{width:100%;justify-content:center}
+
+/* ── ПОЛЯ ВВОДА ── */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);
+  margin-bottom:5px}
+.field input,.field select{width:100%;padding:11px 14px;border:2px solid var(--cream-d);
+  border-radius:10px;font-size:15px;color:var(--ink);background:#fff;
+  transition:border-color .18s;outline:none;font-family:inherit}
+.field input:focus,.field select:focus{border-color:var(--navy-mid)}
+.field input.err{border-color:var(--accent)}
+.errmsg{font-size:12px;color:var(--accent);margin-top:4px;display:none}
+.errmsg.on{display:block}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:460px){.row2{grid-template-columns:1fr}}
+
+/* ── СОГЛАСИЕ ── */
+.consent{display:flex;gap:10px;align-items:flex-start;padding:12px;
+  border-radius:10px;background:var(--cream);cursor:pointer;margin-top:4px}
+.consent input[type=checkbox]{width:17px;height:17px;flex-shrink:0;
+  margin-top:2px;accent-color:var(--navy);cursor:pointer}
+.consent span{font-size:13px;color:var(--ink-soft);line-height:1.5}
+
+/* ── ВВОД КОДА ── */
+#inp-code{font-size:26px;letter-spacing:.35em;text-align:center;font-weight:700;
+  text-transform:uppercase;background:var(--navy-s);border-color:var(--navy-mid);
+  color:var(--navy)}
+
+/* ── ВОПРОСЫ БЛОК 1 ── */
+.q-head{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:20px}
+.q-block-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.q-counter{font-size:13px;color:var(--ink-faint)}
+.q-text{font-size:17px;line-height:1.6;color:var(--ink);margin-bottom:20px}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.opt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;
+  border:2px solid var(--cream-d);border-radius:12px;cursor:pointer;
+  transition:all .15s;background:#fff}
+.opt:hover{border-color:var(--navy-mid);background:var(--navy-s)}
+.opt.sel{border-color:var(--navy);background:var(--navy-s)}
+.opt-letter{width:26px;height:26px;border-radius:50%;background:var(--cream-d);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  font-weight:700;color:var(--ink-soft);flex-shrink:0;margin-top:1px;transition:all .15s}
+.opt.sel .opt-letter{background:var(--navy);color:#fff}
+.opt-text{font-size:14px;line-height:1.5;color:var(--ink-soft)}
+.opt.sel .opt-text{color:var(--ink)}
+
+/* ── ШКАЛА БЛОК 2/3 ── */
+.scale-wrap{margin-bottom:24px}
+.scale-labels{display:flex;justify-content:space-between;margin-bottom:8px}
+.scale-labels span{font-size:11px;color:var(--ink-faint)}
+.scale{display:flex;gap:8px;justify-content:center}
+.sc-btn{width:52px;height:52px;border-radius:50%;border:2px solid var(--cream-d);
+  background:#fff;font-size:16px;font-weight:600;cursor:pointer;
+  transition:all .15s;color:var(--ink-soft);font-family:inherit}
+.sc-btn:hover{border-color:var(--navy-mid);color:var(--navy)}
+.sc-btn.sel{background:var(--navy);border-color:var(--navy);color:#fff}
+@media(max-width:380px){.sc-btn{width:44px;height:44px;font-size:14px}}
+
+/* ── НАВИГАЦИЯ ВОПРОСОВ ── */
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+
+/* ── ИНФО-БЛОК ── */
+.info{border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.info.blue{background:var(--navy-s);border-left:3px solid var(--navy-mid)}
+.info.gold{background:var(--gold-s);border-left:3px solid var(--gold)}
+.info.green{background:var(--green-s);border-left:3px solid var(--green)}
+.info p{font-size:13px;color:var(--ink-soft);margin:0}
+
+/* ── ЛОАДЕР ── */
+#screen-loading{justify-content:center}
+.loader{width:44px;height:44px;border:3px solid var(--cream-d);
+  border-top-color:var(--navy);border-radius:50%;
+  animation:spin 1s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── РЕЗУЛЬТАТ ── */
+.type-pill{display:inline-flex;align-items:center;gap:10px;
+  padding:10px 20px;border-radius:50px;color:#fff;font-size:16px;font-weight:600}
+.score-ring{width:72px;height:72px;border-radius:50%;
+  background:var(--cream-d);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;flex-shrink:0}
+.score-ring .num{font-size:22px;font-weight:700;color:var(--navy);line-height:1}
+.score-ring .lbl{font-size:10px;color:var(--ink-faint);text-transform:uppercase}
+.profile-table{display:grid;gap:6px;margin:16px 0}
+.prow{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;border-radius:8px;background:var(--cream)}
+.prow .pk{font-size:13px;color:var(--ink-soft)}
+.prow .pv{font-size:13px;font-weight:600}
+.bar-row{margin-bottom:10px}
+.bar-top{display:flex;justify-content:space-between;margin-bottom:4px}
+.bar-name{font-size:13px;font-weight:500}
+.bar-right{display:flex;gap:8px;align-items:center}
+.bar-status{font-size:11px}
+.bar-pct{font-size:13px;font-weight:700}
+.bar-track{height:6px;background:var(--cream-d);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+
+/* ── ФИНАЛЬНЫЙ ЭКРАН ── */
+.thank-icon{font-size:64px;text-align:center;margin-bottom:16px}
+.thank-box{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);
+  border-radius:var(--r);padding:28px;text-align:center;color:#fff;margin-top:20px}
+.thank-box h3{color:#fff;font-size:18px;margin-bottom:8px}
+.thank-box p{color:#9aafc8;font-size:14px;margin:0}
+.email-highlight{font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<div id="progress"><div id="progress-fill"></div></div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 1 — КОД ДОСТУПА
+════════════════════════════════════════════════════════ -->
+<div id="screen-code" class="screen on">
+  <div class="top">
+    <img src="logo.png" alt="ADIN" onerror="this.style.display='none'">
+    <div class="top-txt">Association de l'Intelligence Narrative®<br>
+      Sensibilité · Mentalité · Activité</div>
+  </div>
+  <div class="card" style="max-width:480px;text-align:center">
+    <div class="label">Test d'intelligence narrative</div>
+    <h1 style="margin-bottom:20px">Bienvenue</h1>
+    <p style="margin-bottom:24px">Saisissez votre code d'accès.</p>
+    <div class="field">
+      <input id="inp-code" type="text" maxlength="9" placeholder="XXXX-XXXX"
+        autocomplete="off" autocapitalize="characters" spellcheck="false"
+        oninput="fmtCode(this)" onkeydown="if(event.key==='Enter')checkCode()">
+      <div id="code-err" class="errmsg">Code incorrect. Vérifiez votre invitation et réessayez.</div>
+    </div>
+    <button class="btn btn-primary btn-lg btn-full" onclick="checkCode()">Commencer →</button>
+    <p style="margin-top:20px;font-size:12px;color:var(--ink-faint)">
+      Pas de code ? Contactez l'organisateur.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 2 — РЕГИСТРАЦИЯ
+════════════════════════════════════════════════════════ -->
+<div id="screen-reg" class="screen">
+  <div class="top">
+    <img src="logo.png" alt="ADIN" onerror="this.style.display='none'">
+    <div class="top-txt">Association de l'Intelligence Narrative®</div>
+  </div>
+  <div class="card">
+    <div class="label">Шаг 1 из 4</div>
+    <h2>Расскажите о себе</h2>
+    <p style="margin-bottom:20px">Данные используются только для персонализации отчёта.
+      Ваши ответы конфиденциальны.</p>
+    <div class="info blue" style="margin-bottom:20px">
+      <p>Заполнение дополнительных полей помогает нам улучшить инструмент
+        и сделать ваш отчёт более точным. Все поля кроме имени и email необязательны.</p>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Имя <span style="color:var(--accent)">*</span></label>
+        <input id="r-name" type="text" placeholder="Ваше имя">
+        <div id="r-name-e" class="errmsg">Введите имя</div>
+      </div>
+      <div class="field">
+        <label>Email <span style="color:var(--accent)">*</span></label>
+        <input id="r-email" type="email" placeholder="you@example.com">
+        <div id="r-email-e" class="errmsg">Введите корректный email</div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Пол</label>
+        <select id="r-gender">
+          <option value="">Выберите...</option>
+          <option>Мужской</option>
+          <option>Женский</option>
+          <option>Предпочитаю не указывать</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Возраст</label>
+        <select id="r-age">
+          <option value="">Выберите...</option>
+          <option>До 25 лет</option>
+          <option>25–34</option>
+          <option>35–44</option>
+          <option>45–54</option>
+          <option>55–64</option>
+          <option>65 и старше</option>
+          <option>Предпочитаю не указывать</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Семейное положение</label>
+        <select id="r-marital">
+          <option value="">Выберите...</option>
+          <option>Не состою в отношениях</option>
+          <option>В отношениях</option>
+          <option>В браке</option>
+          <option>Разведён(а)</option>
+          <option>Вдовец / вдова</option>
+          <option>Предпочитаю не отвечать</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Есть ли у вас дети?</label>
+        <select id="r-children">
+          <option value="">Выберите...</option>
+          <option>Нет</option>
+          <option>Да</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Уровень образования</label>
+        <select id="r-education">
+          <option value="">Выберите...</option>
+          <option>Среднее</option>
+          <option>Среднее специальное</option>
+          <option>Высшее (бакалавр)</option>
+          <option>Высшее (магистр)</option>
+          <option>Учёная степень (PhD, MD)</option>
+          <option>Другое</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Направление образования</label>
+        <select id="r-edu-field">
+          <option value="">Выберите...</option>
+          <option>Технические науки</option>
+          <option>Естественные науки</option>
+          <option>Социальные науки</option>
+          <option>Гуманитарные науки</option>
+          <option>Экономика и бизнес</option>
+          <option>Искусство и дизайн</option>
+          <option>Медицина</option>
+          <option>Военное дело</option>
+          <option>Другое</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Страна</label>
+        <select id="r-country">
+          <option value="">Выберите...</option>
+          <optgroup label="СНГ">
+            <option>Россия</option>
+            <option>Армения</option>
+            <option>Казахстан</option>
+            <option>Беларусь</option>
+            <option>Украина</option>
+            <option>Узбекистан</option>
+            <option>Азербайджан</option>
+            <option>Молдова</option>
+            <option>Кыргызстан</option>
+            <option>Таджикистан</option>
+            <option>Туркменистан</option>
+          </optgroup>
+          <optgroup label="Европа (не ЕС)">
+            <option>Грузия</option>
+            <option>Швейцария</option>
+            <option>Великобритания</option>
+            <option>Норвегия</option>
+            <option>Исландия</option>
+            <option>Лихтенштейн</option>
+            <option>Сербия</option>
+            <option>Черногория</option>
+          </optgroup>
+          <optgroup label="Европейский союз">
+            <option>Австрия</option>
+            <option>Бельгия</option>
+            <option>Болгария</option>
+            <option>Венгрия</option>
+            <option>Германия</option>
+            <option>Греция</option>
+            <option>Дания</option>
+            <option>Ирландия</option>
+            <option>Испания</option>
+            <option>Италия</option>
+            <option>Кипр</option>
+            <option>Латвия</option>
+            <option>Литва</option>
+            <option>Люксембург</option>
+            <option>Мальта</option>
+            <option>Нидерланды</option>
+            <option>Польша</option>
+            <option>Португалия</option>
+            <option>Румыния</option>
+            <option>Словакия</option>
+            <option>Словения</option>
+            <option>Финляндия</option>
+            <option>Франция</option>
+            <option>Хорватия</option>
+            <option>Чехия</option>
+            <option>Швеция</option>
+            <option>Эстония</option>
+          </optgroup>
+          <optgroup label="Другие регионы">
+            <option>Аргентина</option>
+            <option>Бахрейн</option>
+            <option>Бразилия</option>
+            <option>Израиль</option>
+            <option>Канада</option>
+            <option>Китай</option>
+            <option>Мексика</option>
+            <option>ОАЭ</option>
+            <option>США</option>
+            <option>Турция</option>
+          </optgroup>
+          <option>Другая</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Сфера деятельности</label>
+        <select id="r-field">
+          <option value="">Выберите...</option>
+          <option>Менеджмент / Управление</option>
+          <option>Образование / Наука</option>
+          <option>Консультирование / Коучинг</option>
+          <option>Предпринимательство</option>
+          <option>HR / Организационное развитие</option>
+          <option>Медицина / Здравоохранение</option>
+          <option>Право / Финансы</option>
+          <option>Творческие профессии</option>
+          <option>Другое</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Родной язык</label>
+        <select id="r-lang-native">
+          <option value="">Выберите...</option>
+          <option>Русский</option>
+          <option>Французский</option>
+          <option>Грузинский</option>
+          <option>Казахский</option>
+          <option>Английский</option>
+          <option>Армянский</option>
+          <option>Арабский</option>
+          <option>Испанский</option>
+          <option>Немецкий</option>
+          <option>Китайский</option>
+          <option>Другой</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Дополнительный язык</label>
+        <select id="r-lang-add">
+          <option value="">Выберите...</option>
+          <option>Русский</option>
+          <option>Французский</option>
+          <option>Грузинский</option>
+          <option>Казахский</option>
+          <option>Английский</option>
+          <option>Армянский</option>
+          <option>Арабский</option>
+          <option>Испанский</option>
+          <option>Немецкий</option>
+          <option>Китайский</option>
+          <option>Другой</option>
+          <option>Нет</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Культурная или религиозная традиция
+        <span style="font-weight:400;font-size:11px;color:var(--ink-faint)">
+          — не обязательно по степени веры
+        </span>
+      </label>
+      <select id="r-religion">
+        <option value="">Выберите...</option>
+        <option>Православие</option>
+        <option>Католицизм</option>
+        <option>Протестантизм</option>
+        <option>Ислам</option>
+        <option>Иудаизм</option>
+        <option>Буддизм</option>
+        <option>Индуизм</option>
+        <option>Светская культура</option>
+        <option>Другое</option>
+        <option>Предпочитаю не отвечать</option>
+      </select>
+    </div>
+    <label class="consent">
+      <input type="checkbox" id="r-consent">
+      <span>Я согласен(а) на обработку персональных данных в исследовательских целях
+        Association de l'Intelligence Narrative® согласно GDPR.
+        Данные не передаются третьим лицам.</span>
+    </label>
+    <div id="r-consent-e" class="errmsg">Необходимо согласие для продолжения</div>
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary btn-lg" onclick="startTest()">Начать тест →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 3 — БЛОК 1 (24 вопроса)
+════════════════════════════════════════════════════════ -->
+<div id="screen-b1" class="screen">
+  <div class="top">
+    <img src="logo.png" alt="ADIN" onerror="this.style.display='none'">
+    <div class="top-txt">Association de l'Intelligence Narrative®</div>
+  </div>
+  <div class="card">
+    <div class="q-head">
+      <span class="q-block-label">Блок 1 · Стиль мышления</span>
+      <span class="q-counter" id="b1-cnt">1 / 24</span>
+    </div>
+    <div class="info blue" id="b1-hint">
+      <p>Выберите вариант, который наиболее точно описывает вашу первую реакцию.
+        Нет правильных или неправильных ответов.</p>
+    </div>
+    <div class="q-text" id="b1-text"></div>
+    <div class="options" id="b1-opts"></div>
+    <div class="q-nav">
+      <button class="btn btn-ghost" id="b1-back" onclick="navB1(-1)">← Назад</button>
+      <button class="btn btn-primary" id="b1-next" onclick="navB1(1)" disabled>Далее →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 4 — БЛОК 2 (15 утверждений)
+════════════════════════════════════════════════════════ -->
+<div id="screen-b2" class="screen">
+  <div class="top">
+    <img src="logo.png" alt="ADIN" onerror="this.style.display='none'">
+    <div class="top-txt">Association de l'Intelligence Narrative®</div>
+  </div>
+  <div class="card">
+    <div class="q-head">
+      <span class="q-block-label">Блок 2 · Временная ориентация</span>
+      <span class="q-counter" id="b2-cnt">1 / 15</span>
+    </div>
+    <div class="info blue" id="b2-hint">
+      <p>Оцените насколько каждое утверждение соответствует вашему опыту.
+        1 — совсем не соответствует, 5 — полностью соответствует.</p>
+    </div>
+    <div class="q-text" id="b2-text" style="margin-bottom:20px"></div>
+    <div class="scale-wrap">
+      <div class="scale-labels">
+        <span>Совсем не соответствует</span>
+        <span>Полностью соответствует</span>
+      </div>
+      <div class="scale" id="b2-scale"></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-ghost" onclick="navB2(-1)">← Назад</button>
+      <button class="btn btn-primary" id="b2-next" onclick="navB2(1)" disabled>Далее →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 5 — БЛОК 3 (12 утверждений)
+════════════════════════════════════════════════════════ -->
+<div id="screen-b3" class="screen">
+  <div class="top">
+    <img src="logo.png" alt="ADIN" onerror="this.style.display='none'">
+    <div class="top-txt">Association de l'Intelligence Narrative®</div>
+  </div>
+  <div class="card">
+    <div class="q-head">
+      <span class="q-block-label">Блок 3 · Осознанность</span>
+      <span class="q-counter" id="b3-cnt">1 / 12</span>
+    </div>
+    <div class="q-text" id="b3-text" style="margin-bottom:20px"></div>
+    <div class="scale-wrap">
+      <div class="scale-labels">
+        <span>Совсем не соответствует</span>
+        <span>Полностью соответствует</span>
+      </div>
+      <div class="scale" id="b3-scale"></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-ghost" onclick="navB3(-1)">← Назад</button>
+      <button class="btn btn-accent" id="b3-next" onclick="navB3(1)" disabled>Далее →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 6 — ОТПРАВКА
+════════════════════════════════════════════════════════ -->
+<div id="screen-loading" class="screen" style="justify-content:center">
+  <div class="card" style="text-align:center;max-width:480px">
+    <div class="loader"></div>
+    <h2 style="margin-bottom:8px">Отправляем результаты...</h2>
+    <p>Пожалуйста, не закрывайте страницу.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 7 — СПАСИБО
+════════════════════════════════════════════════════════ -->
+<div id="screen-thanks" class="screen" style="justify-content:center">
+  <div class="top">
+    <img src="logo.png" alt="ADIN" onerror="this.style.display='none'">
+    <div class="top-txt">Association de l'Intelligence Narrative®<br>
+      Sensibilité · Mentalité · Activité</div>
+  </div>
+  <div class="card" style="max-width:520px;text-align:center">
+    <div class="thank-icon">✅</div>
+    <h2 style="margin-bottom:12px">Тест завершён</h2>
+    <p style="margin-bottom:8px">Спасибо за участие!</p>
+    <p>Ваш персональный отчёт будет выслан на</p>
+    <p style="margin:8px 0 24px;font-size:18px;font-weight:700;color:var(--navy)" id="thanks-email"></p>
+    <div class="thank-box">
+      <h3>Что дальше?</h3>
+      <p>Более подробное объяснение результатов и персональные рекомендации
+        вы можете получить у специалиста, имеющего сертификацию ADIN.</p>
+    </div>
+    <p style="margin-top:24px;font-size:12px;color:var(--ink-faint)">
+      Association de l'Intelligence Narrative® · 2026</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ЭКРАН 8 — ОШИБКА ОТПРАВКИ
+════════════════════════════════════════════════════════ -->
+<div id="screen-error" class="screen" style="justify-content:center">
+  <div class="card" style="max-width:480px;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+    <h2 style="margin-bottom:12px">Ошибка отправки</h2>
+    <p style="margin-bottom:20px" id="err-msg">
+      Не удалось отправить ответы на сервер.</p>
+    <div class="info gold" style="text-align:left;margin-bottom:20px">
+      <p>Ваши ответы сохранены в браузере. Нажмите кнопку ниже чтобы попробовать ещё раз.</p>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="retrySubmit()">Попробовать ещё раз</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// КОНФИГУРАЦИЯ
+// Измените API_URL перед деплоем
+// ═══════════════════════════════════════════════════════════════
+const API = 'https://adin-ni-backend-production.up.railway.app/api';
+
+// ═══════════════════════════════════════════════════════════════
+// ВОПРОСЫ БЛОКА 1
+// ═══════════════════════════════════════════════════════════════
+const Q1 = [
+  {id:1,text:"В семье или среди близких возникла серьёзная проблема. Что вы делаете в первую очередь?",opts:[{t:"Стараюсь понять, как именно возникла эта ситуация и какие факторы к ней привели",v:"A"},{t:"Думаю, что можно предпринять прямо сейчас, чтобы двигаться вперёд",v:"B"},{t:"Замечаю, что кто-то давно видел эту проблему, но её игнорировали",v:"C"},{t:"Хочу понять, что эта ситуация значит для каждого из близких",v:"D"}]},
+  {id:2,text:"Вам предлагают заняться чем-то совершенно новым для вас. Ваша первая реакция:",opts:[{t:"Вижу несколько возможностей — и хочу начать",v:"B"},{t:"Замечаю несколько вещей, которые явно не продуманы",v:"C"},{t:"Хочу понять, зачем это нужно и что это изменит для людей",v:"D"},{t:"Хочу разобраться, как это устроено, какова его логика и структура",v:"A"}]},
+  {id:3,text:"Друг рассказывает вам о своей трудной жизненной ситуации. Вы:",opts:[{t:"Замечаю противоречие между тем, что он говорит, и тем, что реально происходит",v:"C"},{t:"Прежде всего хочу понять, что он чувствует и что эта ситуация для него значит",v:"D"},{t:"Пытаюсь понять структуру проблемы — что к ней привело и как она устроена",v:"A"},{t:"Думаю, что конкретно можно сделать, чтобы изменить ситуацию",v:"B"}]},
+  {id:4,text:"Встреча прошла не так, как планировалась. Что вы думаете после неё?",opts:[{t:"Думаю о том, что осталось несказанным и какой смысл имела эта встреча для людей",v:"D"},{t:"Хочу понять, почему именно так получилось — какова была логика произошедшего",v:"A"},{t:"Думаю, что нужно изменить в следующий раз, чтобы получить другой результат",v:"B"},{t:"Вижу конкретные ошибки, которые можно было избежать — и которые, скорее всего, повторятся",v:"C"}]},
+  {id:5,text:"Вы читаете о сложной ситуации, которая случилась с незнакомыми вам людьми. Что вас интересует больше всего?",opts:[{t:"Как именно всё было устроено и почему ситуация развернулась именно так",v:"A"},{t:"Что они могли бы сделать иначе и что можно применить в своей жизни",v:"B"},{t:"Что в этой ситуации было очевидным, но что все предпочитали не замечать",v:"C"},{t:"Что это значило для людей внутри — как они это переживали",v:"D"}]},
+  {id:6,text:"Вам нужно принять важное решение в условиях неопределённости. Вы:",opts:[{t:"Выбираете наиболее перспективный вариант и начинаете двигаться — в процессе разберётесь",v:"B"},{t:"Ищете, что в имеющихся вариантах не учтено или сделано неправильно",v:"C"},{t:"Думаете о том, какое решение будет согласовано с вашими ценностями",v:"D"},{t:"Собираете больше информации, чтобы лучше понять ситуацию",v:"A"}]},
+  {id:7,text:"В компании друзей или в семье возник конфликт. Ваша роль в нём:",opts:[{t:"Называю то, что другие избегают говорить вслух — даже если это неудобно",v:"C"},{t:"Стараюсь понять, что стоит за позицией каждого, и создать пространство для диалога",v:"D"},{t:"Пытаюсь разобраться в причинах и понять, как возникло это противоречие",v:"A"},{t:"Хочу быстро найти решение и двигаться дальше",v:"B"}]},
+  {id:8,text:"Вы узнаёте о новой идее или концепции. Что происходит дальше?",opts:[{t:"Думаю о том, какой смысл она несёт и что меняет в понимании мира",v:"D"},{t:"Хочу понять её логику и структуру — как она работает изнутри",v:"A"},{t:"Сразу думаю, где и как её можно применить",v:"B"},{t:"Замечаю, где в ней есть противоречия или слабые места",v:"C"}]},
+  {id:9,text:"Вы заканчиваете большое начинание, в которое вложили много сил. Что вы чувствуете в первую очередь?",opts:[{t:"Хочу понять, что в этом получилось хорошо, а что — нет, и почему",v:"A"},{t:"Уже думаю о следующем шаге — что можно сделать дальше",v:"B"},{t:"Вижу, что можно было сделать лучше — и что помешало этому",v:"C"},{t:"Думаю о том, что это значило для меня и для людей, с которыми я это делал",v:"D"}]},
+  {id:10,text:"Вам рассказывают о человеке, которого вы не знаете. Что вас интересует больше всего?",opts:[{t:"Что он делает и чего достиг",v:"B"},{t:"Насколько его слова соответствуют его поступкам",v:"C"},{t:"Что для него важно и что им движет",v:"D"},{t:"Как он думает и какова логика его действий",v:"A"}]},
+  {id:11,text:"Вы готовитесь к важному разговору. Больше всего времени вы тратите на:",opts:[{t:"Подготовку аргументов о том, что идёт не так и почему важно это изменить",v:"C"},{t:"Понимание того, что важно для другого человека и что этот разговор значит для вас обоих",v:"D"},{t:"Понимание контекста и логики ситуации — что к ней привело",v:"A"},{t:"Обдумывание того, что конкретно хотите предложить или изменить",v:"B"}]},
+  {id:12,text:"Вы получили неожиданную обратную связь о себе. Ваша первая реакция:",opts:[{t:"Думаю о том, что эта обратная связь значит для моего понимания себя",v:"D"},{t:"Хочу понять, на чём основана эта оценка и насколько она объективна",v:"A"},{t:"Думаю, что конкретно можно изменить в своём поведении",v:"B"},{t:"Проверяю, насколько эта обратная связь честна и не противоречит ли она другим фактам",v:"C"}]},
+  {id:13,text:"Вы видите, что план не работает. Что вы делаете?",opts:[{t:"Анализирую, где именно произошёл сбой и почему",v:"A"},{t:"Быстро адаптирую план и продолжаю двигаться",v:"B"},{t:"Говорю прямо: этот подход изначально был неверным — вот почему",v:"C"},{t:"Думаю о том, чему нас учит эта ситуация и что важно сохранить",v:"D"}]},
+  {id:14,text:"Вы изучаете новую область. Как вы это делаете?",opts:[{t:"Сразу пробую применять — учусь в действии, по ходу заполняя пробелы",v:"B"},{t:"Ищу противоречия и дискуссионные точки — там, где нет единого мнения, самое интересное",v:"C"},{t:"Ищу смысл и связь с тем, что уже важно для меня",v:"D"},{t:"Систематически — строю понимание от основ к деталям",v:"A"}]},
+  {id:15,text:"В разговоре вы замечаете, что собеседник говорит одно, а имеет в виду другое. Вы:",opts:[{t:"Называю противоречие прямо — это важно для честного разговора",v:"C"},{t:"Стараюсь понять, что он на самом деле чувствует и чего не решается сказать",v:"D"},{t:"Пытаюсь понять, что стоит за его словами — какова логика его позиции",v:"A"},{t:"Фокусируюсь на том, что можно сделать с тем, что он реально хочет",v:"B"}]},
+  {id:16,text:"Вам нужно объяснить сложную идею другому человеку. Вы:",opts:[{t:"Ищу образ или историю, которая затронет и сделает идею живой",v:"D"},{t:"Строю объяснение от логики к деталям — сначала структура, потом части",v:"A"},{t:"Показываю на примере, как это работает на практике",v:"B"},{t:"Начинаю с того, что обычно понимают неправильно",v:"C"}]},
+  {id:17,text:"Вы наблюдаете за тем, как группа людей принимает решение. Что вы замечаете в первую очередь?",opts:[{t:"Логику процесса — как выстроено обсуждение и на чём основаны аргументы",v:"A"},{t:"Есть ли у группы понимание следующего шага и движется ли она к результату",v:"B"},{t:"Что группа избегает называть — какая тема обходится стороной",v:"C"},{t:"Как себя чувствуют люди в этом процессе",v:"D"}]},
+  {id:18,text:"Вы переживаете сложный период в жизни. Что помогает вам двигаться вперёд?",opts:[{t:"Сосредоточенность на конкретных шагах — что я могу сделать прямо сейчас",v:"B"},{t:"Ясность в том, что именно пошло не так и что нужно изменить",v:"C"},{t:"Понимание смысла происходящего — зачем это и чему это учит",v:"D"},{t:"Понимание того, как эта ситуация устроена и каковы её причины",v:"A"}]},
+  {id:19,text:"Вы участвуете в обсуждении общего плана. Ваш главный вклад:",opts:[{t:"Указываю на слабые места и допущения, которые могут обернуться проблемами",v:"C"},{t:"Поднимаю вопрос о смысле этого плана — зачем это нам",v:"D"},{t:"Задаю вопросы о том, как всё связано — ищу логику",v:"A"},{t:"Предлагаю конкретные шаги и точки входа — где можно начать прямо сейчас",v:"B"}]},
+  {id:20,text:"Вы слышите историю чьего-то успеха. Что вас интересует больше всего?",opts:[{t:"Что этот опыт значил для человека — как он его изменил",v:"D"},{t:"Как именно это было достигнуто — какова была логика пути",v:"A"},{t:"Что из этого можно применить в своей ситуации",v:"B"},{t:"Что на самом деле стоит за этим успехом",v:"C"}]},
+  {id:21,text:"Вам нужно написать важное письмо. С чего вы начинаете?",opts:[{t:"С логики — сначала выстраиваю структуру аргументов",v:"A"},{t:"С главного вывода — что я хочу, чтобы человек сделал после прочтения",v:"B"},{t:"С того, что важно назвать честно — даже если это неудобно",v:"C"},{t:"С того, что почувствует читатель — какой тон создаст нужный контакт",v:"D"}]},
+  {id:22,text:"Дело, в котором вы участвуете, движется не в том направлении. Вы:",opts:[{t:"Предлагаю конкретный разворот и готов взять на себя ответственность",v:"B"},{t:"Говорю прямо, что направление неверное — и объясняю, почему",v:"C"},{t:"Поднимаю вопрос о том, ради чего мы всё это делаем",v:"D"},{t:"Хочу сначала понять, в какой момент и почему произошёл сдвиг",v:"A"}]},
+  {id:23,text:"Вы узнаёте, что человек, которому вы доверяли, поступил нечестно. Ваша первая реакция:",opts:[{t:"Это подтверждает то, что я замечал — и что важно было назвать раньше",v:"C"},{t:"Переживаю разрыв доверия — думаю о том, что это значит для наших отношений",v:"D"},{t:"Хочу понять, как это стало возможным — что упустил я",v:"A"},{t:"Думаю, что нужно изменить в ситуации, чтобы двигаться вперёд",v:"B"}]},
+  {id:24,text:"В конце дня вы думаете о том, что произошло. Что занимает ваши мысли?",opts:[{t:"Думаю о том, что было настоящим в этом дне — что действительно имело значение",v:"D"},{t:"Пытаюсь связать события дня в единую картину — что к чему привело",v:"A"},{t:"Думаю о том, что продвинулось вперёд и что нужно сделать завтра",v:"B"},{t:"Замечаю расхождения между тем, что было задумано, и тем, что реально произошло",v:"C"}]},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// УТВЕРЖДЕНИЯ БЛОКА 2
+// ═══════════════════════════════════════════════════════════════
+const Q2 = [
+  {id:1,text:"Прошлые неудачи продолжают влиять на то, как я принимаю решения сегодня.",f:"PN"},
+  {id:2,text:"Когда что-то идёт не так, я склонен думать, что так у меня бывает всегда.",f:"PN"},
+  {id:3,text:"Болезненный опыт прошлого нередко мешает мне действовать уверенно в настоящем.",f:"PN"},
+  {id:4,text:"Воспоминания о хороших временах дают мне опору, когда сейчас трудно.",f:"PP"},
+  {id:5,text:"Прошлый опыт — мой главный ресурс: именно там я нахожу то, что работает.",f:"PP"},
+  {id:6,text:"Я люблю возвращаться к историям из своей жизни — они помогают мне понять, кто я.",f:"PP"},
+  {id:7,text:"Я редко верю, что могу существенно изменить то, что происходит в моей жизни.",f:"NF"},
+  {id:8,text:"То, что случается со мной, часто кажется результатом обстоятельств, а не моих решений.",f:"NF"},
+  {id:9,text:"Планировать будущее не имеет смысла — всё равно всё идёт не так, как задумано.",f:"NF"},
+  {id:10,text:"Я живу настоящим моментом — и мне трудно думать о последствиях далёкого будущего.",f:"NH"},
+  {id:11,text:"Спонтанные решения нередко оказываются лучшими — лучше действовать, чем планировать.",f:"NH"},
+  {id:12,text:"Мне важно получать удовольствие от того, что происходит прямо сейчас.",f:"NH"},
+  {id:13,text:"Я часто думаю о том, чего хочу достичь — и строю конкретные планы для этого.",f:"F"},
+  {id:14,text:"Мои сегодняшние решения определяются тем, к чему я хочу прийти в будущем.",f:"F"},
+  {id:15,text:"Я готов отказаться от сиюминутного удовольствия ради долгосрочного результата.",f:"F"},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// УТВЕРЖДЕНИЯ БЛОКА 3
+// ═══════════════════════════════════════════════════════════════
+const Q3 = [
+  {id:1,text:"Когда я рассказываю о том, что произошло, мне кажется, что я просто излагаю факты — а не свою версию событий.",lv:1,inv:true},
+  {id:2,text:"Если в моей жизни что-то повторяется — это скорее особенности мира или других людей, а не мои привычные реакции.",lv:1,inv:true},
+  {id:3,text:"Когда кто-то видит ту же ситуацию совсем иначе, чем я, мне трудно понять, как это возможно.",lv:1,inv:true},
+  {id:4,text:"Я замечаю, что в похожих ситуациях реагирую примерно одинаково — и могу это назвать.",lv:2,inv:false},
+  {id:5,text:"Я вижу разницу между тем, что произошло, и тем, что я об этом думаю.",lv:2,inv:false},
+  {id:6,text:"Иногда я ловлю себя на том, что реагирую по привычке — хотя ситуация могла бы потребовать другого подхода.",lv:2,inv:false},
+  {id:7,text:"Когда я намеренно смотрю на ситуацию с другой стороны — моя реакция реально меняется.",lv:3,inv:false},
+  {id:8,text:"Понимая, какой привычный сценарий включается, я могу выбрать другой способ действовать.",lv:3,inv:false},
+  {id:9,text:"Я регулярно отслеживаю свои привычные способы объяснять происходящее — и меняю их, когда они мне не помогают.",lv:3,inv:false},
+  {id:10,text:"Я вижу, как мои личные убеждения связаны с убеждениями группы или культуры, в которой я вырос.",lv:4,inv:false},
+  {id:11,text:"Я умею работать с привычными реакциями и убеждениями других людей — не только своими.",lv:4,inv:false},
+  {id:12,text:"Я могу спокойно удерживать противоречие между разными точками зрения, не торопясь разрешить его немедленно.",lv:4,inv:false},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// СОСТОЯНИЕ
+// ═══════════════════════════════════════════════════════════════
+const S = {
+  codeId: null, sessionId: null,
+  name: '', email: '',
+  a1: {}, a2: {}, a3: {},
+  i1: 0, i2: 0, i3: 0,
+  // Латинский квадрат: рандомизация порядка вариантов без повторений
+  latinOrders: [[0,1,2,3],[1,2,3,0],[2,3,0,1],[3,0,1,2]],
+  // Системные данные
+  timing: {},       // время ответа на каждый вопрос в мс: {'b1_1': 4200, ...}
+  backtracks: 0,    // количество возвратов к предыдущим вопросам
+  qStart: 0,        // timestamp когда показан текущий вопрос
+};
+
+// ═══════════════════════════════════════════════════════════════
+// УТИЛИТЫ
+// ═══════════════════════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+const go = id => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  $(id).classList.add('on');
+  window.scrollTo(0, 0);
+  updateProgress();
+};
+
+function updateProgress() {
+  const done = Object.keys(S.a1).length + Object.keys(S.a2).length + Object.keys(S.a3).length;
+  const total = Q1.length + Q2.length + Q3.length;
+  $('progress-fill').style.width = Math.round(done / total * 100) + '%';
+}
+
+// Сохранение в localStorage как страховка от закрытия браузера
+function saveLocal() {
+  try {
+    localStorage.setItem('adin_test', JSON.stringify({
+      sessionId: S.sessionId, codeId: S.codeId,
+      name: S.name, email: S.email,
+      a1: S.a1, a2: S.a2, a3: S.a3,
+      ts: Date.now()
+    }));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ШАГ 1: КОД ДОСТУПА
+// ═══════════════════════════════════════════════════════════════
+function fmtCode(inp) {
+  let v = inp.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 8);
+  inp.value = v.length > 4 ? v.slice(0,4) + '-' + v.slice(4) : v;
+}
+
+async function checkCode() {
+  const raw = $('inp-code').value.replace(/-/g,'').toUpperCase().trim();
+  const errEl = $('code-err');
+  errEl.classList.remove('on');
+  errEl.textContent = '';
+
+  if (raw.length < 4) {
+    errEl.textContent = 'Saisissez votre code d'accès.';
+    errEl.classList.add('on');
+    return;
+  }
+
+  // Блокируем повторный вызов
+  const btn = document.querySelector('#screen-code .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Проверяем...'; }
+
+  try {
+    const r = await fetch(API + '/test/verify-code', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({code: raw})
+    });
+    const d = await r.json();
+
+    if (!d.valid) {
+      const msgs = {
+        not_found:    'Код не найден. Проверьте правильность ввода.',
+        already_used: 'Этот код уже был использован.',
+        expired:      'Срок действия кода истёк. Обратитесь к организатору.',
+      };
+      errEl.textContent = msgs[d.reason] || 'Неверный код. Попробуйте ещё раз.';
+      errEl.classList.add('on');
+      if (btn) { btn.disabled = false; btn.textContent = 'Commencer →'; }
+      return;
+    }
+
+    S.codeId = d.codeId;
+    if (d.invitedEmail) {
+      $('r-email').value = d.invitedEmail;
+      $('r-email').readOnly = true;
+      $('r-email').style.background = 'var(--cream)';
+      $('r-email').style.color = 'var(--ink-soft)';
+      $('r-email').title = 'Email задан приглашением и не может быть изменён';
+    }
+    if (d.invitedName)  $('r-name').value  = d.invitedName;
+    go('screen-reg');
+
+  } catch(e) {
+    errEl.textContent = 'Ошибка соединения с сервером. Проверьте интернет и попробуйте ещё раз.';
+    errEl.classList.add('on');
+    if (btn) { btn.disabled = false; btn.textContent = 'Commencer →'; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ШАГ 2: РЕГИСТРАЦИЯ
+// ═══════════════════════════════════════════════════════════════
+async function startTest() {
+  const name    = $('r-name').value.trim();
+  const email   = $('r-email').value.trim();
+  const consent = $('r-consent').checked;
+  let ok = true;
+
+  // Валидация
+  const ve = (id, cond) => {
+    $(id).classList[cond ? 'remove' : 'add']('on');
+    if (!cond) ok = false;
+  };
+  ve('r-name-e',    !!name);
+  ve('r-email-e',   !!(email && email.includes('@') && email.includes('.')));
+  ve('r-consent-e', consent);
+  if (!ok) return;
+
+  S.name  = name;
+  S.email = email;
+  const country    = $('r-country').value;
+  const field      = $('r-field').value;
+  const gender     = $('r-gender').value;
+  const age        = $('r-age').value;
+  const marital    = $('r-marital').value;
+  const children   = $('r-children').value;
+  const education  = $('r-education').value;
+  const eduField   = $('r-edu-field').value;
+  const langNative = $('r-lang-native').value;
+  const langAdd    = $('r-lang-add').value;
+  const religion   = $('r-religion').value;
+
+  const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+
+  try {
+    const r = await fetch(API + '/test/start', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        codeId: S.codeId, name, email, country, field,
+        gender, age, marital, children, education, eduField,
+        langNative, langAdd, religion,
+        consent: true, deviceType: device,
+        // Системные данные — фиксируем время начала
+        startedAt: new Date().toISOString(),
+      })
+    });
+    const d = await r.json();
+    if (d.error) { alert('Ошибка: ' + d.error); return; }
+    S.sessionId = d.sessionId;
+  } catch(e) {
+    // Сервер недоступен — создаём временный ID, данные отправим при submit
+    S.sessionId = 'local-' + Date.now();
+  }
+
+  saveLocal();
+  S.i1 = 0;
+  renderB1();
+  go('screen-b1');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// БЛОК 1
+// ═══════════════════════════════════════════════════════════════
+function renderB1() {
+  S.qStart = Date.now(); // фиксируем время показа вопроса
+  const q = Q1[S.i1];
+  $('b1-cnt').textContent = (S.i1 + 1) + ' / ' + Q1.length;
+  $('b1-text').textContent = q.text;
+  $('b1-hint').style.display = S.i1 === 0 ? 'block' : 'none';
+
+  // Латинский квадрат
+  const order = S.latinOrders[S.i1 % 4];
+  const opts  = order.map(i => q.opts[i]);
+  const letters = ['А','Б','В','Г'];
+
+  const container = $('b1-opts');
+  container.innerHTML = '';
+  opts.forEach((o, idx) => {
+    const div = document.createElement('div');
+    div.className = 'opt' + (S.a1[q.id] === o.v ? ' sel' : '');
+    div.innerHTML = `<div class="opt-letter">${letters[idx]}</div>
+                     <div class="opt-text">${o.t}</div>`;
+    div.onclick = () => { S.a1[q.id] = o.v; saveLocal(); renderB1(); updateProgress(); };
+    container.appendChild(div);
+  });
+
+  const has = !!S.a1[q.id];
+  $('b1-next').disabled = !has;
+  $('b1-next').textContent = S.i1 < Q1.length - 1 ? 'Далее →' : 'Следующий блок →';
+  $('b1-back').style.visibility = S.i1 === 0 ? 'hidden' : 'visible';
+}
+
+function navB1(dir) {
+  if (dir === 1 && !S.a1[Q1[S.i1].id]) return;
+  // Фиксируем время ответа
+  if (dir === 1 && S.qStart) {
+    S.timing['b1_' + Q1[S.i1].id] = Date.now() - S.qStart;
+  }
+  // Считаем возвраты
+  if (dir === -1) S.backtracks++;
+  if (dir === 1 && S.i1 === Q1.length - 1) {
+    S.i2 = 0; renderB2(); go('screen-b2'); return;
+  }
+  if (dir === -1 && S.i1 === 0) return;
+  S.i1 += dir; renderB1();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// БЛОК 2
+// ═══════════════════════════════════════════════════════════════
+function renderB2() {
+  const s = Q2[S.i2];
+  $('b2-cnt').textContent  = (S.i2 + 1) + ' / ' + Q2.length;
+  $('b2-text').textContent = s.text;
+  $('b2-hint').style.display = S.i2 === 0 ? 'block' : 'none';
+
+  const scale = $('b2-scale');
+  scale.innerHTML = '';
+  for (let v = 1; v <= 5; v++) {
+    const btn = document.createElement('button');
+    btn.className = 'sc-btn' + (S.a2[s.id] === v ? ' sel' : '');
+    btn.textContent = v;
+    btn.onclick = () => { S.a2[s.id] = v; saveLocal(); renderB2(); updateProgress(); };
+    scale.appendChild(btn);
+  }
+
+  $('b2-next').disabled = !S.a2[s.id];
+  $('b2-next').textContent = S.i2 < Q2.length - 1 ? 'Далее →' : 'Следующий блок →';
+}
+
+function navB2(dir) {
+  if (dir === 1 && !S.a2[Q2[S.i2].id]) return;
+  if (dir === 1 && S.qStart) S.timing['b2_' + Q2[S.i2].id] = Date.now() - S.qStart;
+  if (dir === -1) S.backtracks++;
+  if (dir === 1 && S.i2 === Q2.length - 1) {
+    S.i3 = 0; renderB3(); go('screen-b3'); return;
+  }
+  if (dir === -1 && S.i2 === 0) { S.i1 = Q1.length - 1; renderB1(); go('screen-b1'); return; }
+  S.i2 += dir; renderB2();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// БЛОК 3
+// ═══════════════════════════════════════════════════════════════
+function renderB3() {
+  const s = Q3[S.i3];
+  $('b3-cnt').textContent  = (S.i3 + 1) + ' / ' + Q3.length;
+  $('b3-text').textContent = s.text;
+
+  const scale = $('b3-scale');
+  scale.innerHTML = '';
+  for (let v = 1; v <= 5; v++) {
+    const btn = document.createElement('button');
+    btn.className = 'sc-btn' + (S.a3[s.id] === v ? ' sel' : '');
+    btn.textContent = v;
+    btn.onclick = () => { S.a3[s.id] = v; saveLocal(); renderB3(); updateProgress(); };
+    scale.appendChild(btn);
+  }
+
+  $('b3-next').disabled = !S.a3[s.id];
+  $('b3-next').textContent = S.i3 < Q3.length - 1 ? 'Далее →' : 'Завершить тест →';
+}
+
+function navB3(dir) {
+  if (dir === 1 && !S.a3[Q3[S.i3].id]) return;
+  if (dir === 1 && S.qStart) S.timing['b3_' + Q3[S.i3].id] = Date.now() - S.qStart;
+  if (dir === -1) S.backtracks++;
+  if (dir === 1 && S.i3 === Q3.length - 1) { submitTest(); return; }
+  if (dir === -1 && S.i3 === 0) { S.i2 = Q2.length - 1; renderB2(); go('screen-b2'); return; }
+  S.i3 += dir; renderB3();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ОТПРАВКА
+// ═══════════════════════════════════════════════════════════════
+async function submitTest() {
+  go('screen-loading');
+  $('progress-fill').style.width = '100%';
+  saveLocal();
+
+  const payload = {
+    sessionId: S.sessionId,
+    answers1: S.a1,
+    answers2: S.a2,
+    answers3: S.a3,
+    // Системные данные
+    systemData: {
+      completedAt:  new Date().toISOString(),
+      backtracks:   S.backtracks,
+      timing:       S.timing,
+    },
+  };
+
+  try {
+    const r = await fetch(API + '/test/submit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      showError(d.error || 'Ошибка сервера (' + r.status + ')');
+      return;
+    }
+
+    const d = await r.json();
+
+    // Очищаем localStorage после успешной отправки
+    try { localStorage.removeItem('adin_test'); } catch(e) {}
+
+    $('thanks-email').textContent = S.email;
+    go('screen-thanks');
+
+  } catch(e) {
+    showError('Нет соединения с сервером.');
+  }
+}
+
+async function retrySubmit() {
+  // Восстанавливаем данные из localStorage если нужно
+  try {
+    const saved = JSON.parse(localStorage.getItem('adin_test') || 'null');
+    if (saved && saved.a1) {
+      S.a1 = saved.a1; S.a2 = saved.a2; S.a3 = saved.a3;
+      S.sessionId = saved.sessionId;
+      S.email = saved.email || S.email;
+    }
+  } catch(e) {}
+  await submitTest();
+}
+
+function showError(msg) {
+  $('err-msg').textContent = msg + ' Ваши ответы сохранены. Попробуйте отправить ещё раз.';
+  go('screen-error');
+}
+</script>
+</body>
+</html>
