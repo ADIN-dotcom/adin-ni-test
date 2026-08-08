@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Нарративный статус · ADIN</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1E3A5F;--navy-mid:#2d5a8e;--navy-s:#dce8f5;
+  --cream:#f8f6f0;--cream-d:#ede8df;
+  --ink:#1a1a2e;--ink-soft:#4a4a6a;--ink-faint:#8888a8;
+  --green:#2D6A4F;--green-s:#e8f3ec;
+  --red:#C8432A;--red-s:#fee2e2;
+  --gold:#c9a84c;--gold-s:#fff8e1;
+  --white:#fff;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  background:var(--cream);color:var(--ink);min-height:100vh;
+  display:flex;flex-direction:column}
+
+/* HEADER */
+.header{background:var(--navy);padding:16px 24px;display:flex;
+  align-items:center;justify-content:space-between}
+.logo{color:#fff;font-size:20px;font-weight:700;letter-spacing:.02em}
+.logo-sub{color:#9aafc8;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.progress-wrap{display:flex;align-items:center;gap:10px}
+.progress-bar{width:160px;height:4px;background:rgba(255,255,255,.2);border-radius:2px}
+.progress-fill{height:100%;background:#fff;border-radius:2px;transition:width .4s}
+.progress-txt{color:#9aafc8;font-size:12px}
+
+/* SCREENS */
+.screen{display:none;flex:1;flex-direction:column}
+.screen.active{display:flex}
+
+/* INTRO */
+.intro-wrap{max-width:600px;margin:48px auto;padding:0 24px;text-align:center}
+.intro-wrap h1{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.intro-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7;margin-bottom:16px}
+.block-badges{display:flex;gap:10px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500}
+.badge-1{background:var(--navy-s);color:var(--navy)}
+.badge-2{background:var(--gold-s);color:#7b5800}
+.badge-3{background:var(--green-s);color:var(--green)}
+.btn-start{display:inline-block;padding:14px 36px;background:var(--navy);
+  color:#fff;border-radius:10px;font-size:16px;font-weight:500;
+  cursor:pointer;border:none;font-family:inherit;transition:background .18s}
+.btn-start:hover{background:var(--navy-mid)}
+
+/* QUESTION */
+.q-wrap{max-width:680px;margin:0 auto;padding:32px 24px;flex:1;
+  display:flex;flex-direction:column}
+.q-block-label{font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:20px}
+.q-num{font-size:13px;color:var(--ink-faint);margin-bottom:8px}
+.q-text{font-size:20px;font-weight:500;color:var(--ink);line-height:1.5;margin-bottom:8px}
+.q-hint{font-size:13px;color:var(--ink-faint);font-style:italic;margin-bottom:24px;line-height:1.5}
+.q-input{width:100%;min-height:120px;padding:14px 16px;
+  border:2px solid var(--cream-d);border-radius:10px;
+  font-size:15px;font-family:inherit;color:var(--ink);
+  background:#fff;resize:vertical;line-height:1.6;transition:border .2s}
+.q-input:focus{outline:none;border-color:var(--navy)}
+.q-input.short{min-height:60px}
+.q-nav{display:flex;justify-content:space-between;align-items:center;
+  margin-top:24px;padding-top:20px;border-top:1px solid var(--cream-d)}
+.btn-nav{padding:11px 24px;border-radius:8px;font-size:15px;
+  font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .18s}
+.btn-back{background:var(--cream-d);color:var(--ink-soft)}
+.btn-back:hover{background:#e0dbd4}
+.btn-next{background:var(--navy);color:#fff}
+.btn-next:hover{background:var(--navy-mid)}
+.btn-next:disabled{background:#b0bcc8;cursor:not-allowed}
+.char-count{font-size:12px;color:var(--ink-faint)}
+
+/* FINISH */
+.finish-wrap{max-width:560px;margin:64px auto;padding:0 24px;text-align:center}
+.finish-icon{font-size:56px;margin-bottom:24px}
+.finish-wrap h2{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.finish-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7}
+
+/* ERROR */
+.error-msg{color:var(--red);font-size:13px;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">ADIN</div>
+    <div class="logo-sub">Нарратив будущего</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-txt" id="progress-txt">0 / 13</div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <div class="intro-wrap">
+    <h1>Нарративный статус</h1>
+    <p>13 вопросов о вашем опыте в компании — прошлом, настоящем и будущем.<br>
+    Нет правильных или неправильных ответов. Пишите первое что приходит — коротко или развёрнуто.</p>
+    <div class="block-badges">
+      <span class="badge badge-1">① Прошлое · 4 вопроса</span>
+      <span class="badge badge-2">② Настоящее · 6 вопросов</span>
+      <span class="badge badge-3">③ Будущее · 3 вопроса</span>
+    </div>
+    <p style="font-size:14px;color:var(--ink-faint)">Ориентировочное время — 10–15 минут</p>
+    <br>
+    <button class="btn-start" onclick="startForm()">Начать</button>
+  </div>
+</div>
+
+<!-- QUESTIONS -->
+<div class="screen" id="screen-questions">
+  <div class="q-wrap">
+    <div class="q-block-label" id="q-block"></div>
+    <div class="q-num" id="q-num"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-hint" id="q-hint"></div>
+    <textarea class="q-input" id="q-answer" placeholder="Ваш ответ..."
+      oninput="onInput()"></textarea>
+    <div class="error-msg" id="error-msg">Пожалуйста, напишите хотя бы несколько слов</div>
+    <div class="q-nav">
+      <button class="btn-nav btn-back" onclick="goBack()" id="btn-back">← Назад</button>
+      <div style="display:flex;align-items:center;gap:16px">
+        <span class="char-count" id="char-count"></span>
+        <button class="btn-nav btn-next" onclick="goNext()" id="btn-next">Далее →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FINISH -->
+<div class="screen" id="screen-finish">
+  <div class="finish-wrap">
+    <div class="finish-icon">✅</div>
+    <h2>Спасибо!</h2>
+    <p>Ваши ответы получены и переданы фасилитатору программы.<br><br>
+    Результаты анализа будут использованы для подготовки сценария программы «Нарратив будущего».</p>
+  </div>
+</div>
+
+<div class="screen" id="screen-error">
+  <div class="finish-wrap">
+    <div class="finish-icon">⚠️</div>
+    <h2>Что-то пошло не так</h2>
+    <p id="error-detail">Пожалуйста, свяжитесь с организатором программы.</p>
+  </div>
+</div>
+
+<script>
+const API = 'https://adin-ni-backend-production.up.railway.app/api';
+
+const QUESTIONS = [
+  // Блок 1 — Прошлое
+  {
+    block:'① Прошлое', n:'01',
+    text:'Вспомните момент в работе, когда всё шло именно так, как надо. Что тогда происходило?',
+    hint:'Опишите ситуацию — что было, кто был рядом, что вы чувствовали.',
+    short:false,
+  },
+  {
+    block:'① Прошлое', n:'02',
+    text:'Что из того, что было раньше в вашей команде или компании, вы бы хотели вернуть?',
+    hint:'Это может быть атмосфера, способ работы, конкретный человек или период.',
+    short:false,
+  },
+  {
+    block:'① Прошлое', n:'03',
+    text:'Если бы вы описали последние 2–3 года в компании одним словом — какое это слово?',
+    hint:'Первое слово которое приходит.',
+    short:true,
+  },
+  {
+    block:'① Прошлое', n:'04',
+    text:'Если описать последние 2–3 года вашей собственной жизни одним словом — какое это слово?',
+    hint:'Не о компании — о вас лично.',
+    short:true,
+  },
+  // Блок 2 — Настоящее
+  {
+    block:'② Настоящее', n:'05',
+    text:'Что сейчас происходит в компании — если объяснить это как историю с героями и сюжетом?',
+    hint:'Кто герои? Кто злодеи? Есть ли сюжет? Чем всё может закончиться?',
+    short:false,
+  },
+  {
+    block:'② Настоящее', n:'06',
+    text:'Что сейчас забирает у вас больше всего энергии на работе?',
+    hint:'Что тяжелее всего — люди, задачи, ситуации, атмосфера?',
+    short:false,
+  },
+  {
+    block:'② Настоящее', n:'07',
+    text:'Если бы компания была персонажем в книге — кем она была бы прямо сейчас? Что с ней происходит?',
+    hint:'Это может быть любой персонаж — из книги, фильма, сказки.',
+    short:false,
+  },
+  {
+    block:'② Настоящее', n:'08',
+    text:'Закончите предложение: «Мы бы двигались быстрее, если бы не…»',
+    hint:'',
+    short:false,
+    prefix:'Мы бы двигались быстрее, если бы не ',
+  },
+  {
+    block:'② Настоящее', n:'09',
+    text:'Закончите предложение: «В этой ситуации моя роль — это…»',
+    hint:'',
+    short:false,
+    prefix:'В этой ситуации моя роль — это ',
+  },
+  {
+    block:'② Настоящее', n:'10',
+    text:'Что для вас означает слово «изменение» — первая ассоциация, одно-два слова?',
+    hint:'Не думайте — первое что приходит.',
+    short:true,
+  },
+  // Блок 3 — Будущее
+  {
+    block:'③ Будущее', n:'11',
+    text:'Представьте: прошло три года. Что изменилось? Опишите один конкретный момент из той жизни.',
+    hint:'Где вы? Что происходит? Кто рядом? Что вы чувствуете?',
+    short:false,
+  },
+  {
+    block:'③ Будущее', n:'12',
+    text:'Что должно произойти, чтобы вы почувствовали: «вот теперь всё идёт как надо»?',
+    hint:'Конкретное событие, изменение, результат.',
+    short:false,
+  },
+  {
+    block:'③ Будущее', n:'13',
+    text:'Закончите предложение: «Мы как команда способны на…»',
+    hint:'',
+    short:false,
+    prefix:'Мы как команда способны на ',
+  },
+];
+
+let current = 0;
+const answers = {};
+
+// Получаем параметры из URL
+const params = new URLSearchParams(location.search);
+const participantId = params.get('pid');
+const groupId = params.get('gid');
+
+function startForm() {
+  showScreen('screen-questions');
+  renderQuestion();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-block').textContent = q.block;
+  document.getElementById('q-num').textContent = `Вопрос ${q.n} из 13`;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint || '';
+  document.getElementById('q-hint').style.display = q.hint ? 'block' : 'none';
+
+  const ta = document.getElementById('q-answer');
+  ta.className = 'q-input' + (q.short ? ' short' : '');
+  ta.value = answers[q.n] || '';
+  if (q.prefix && !ta.value) ta.value = q.prefix;
+  ta.focus();
+
+  document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Отправить ✓' : 'Далее →';
+  document.getElementById('error-msg').style.display = 'none';
+
+  updateProgress();
+  updateCharCount();
+}
+
+function onInput() {
+  updateCharCount();
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+function updateCharCount() {
+  const val = document.getElementById('q-answer').value.trim();
+  const q = QUESTIONS[current];
+  const prefix = q.prefix || '';
+  const actual = val.startsWith(prefix) ? val.slice(prefix.length) : val;
+  document.getElementById('char-count').textContent = actual.length > 0 ? actual.length + ' симв.' : '';
+}
+
+function updateProgress() {
+  const pct = Math.round((current / QUESTIONS.length) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('progress-txt').textContent = current + ' / ' + QUESTIONS.length;
+}
+
+function goBack() {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function goNext() {
+  const val = document.getElementById('q-answer').value.trim();
+  const q = QUESTIONS[current];
+  const prefix = q.prefix || '';
+  const actual = val.startsWith(prefix) ? val.slice(prefix.length).trim() : val;
+
+  if (actual.length < 2) {
+    document.getElementById('error-msg').style.display = 'block';
+    return;
+  }
+
+  answers[q.n] = val;
+
+  if (current < QUESTIONS.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    submitForm();
+  }
+}
+
+async function submitForm() {
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true;
+  btn.textContent = 'Отправляем…';
+
+  try {
+    const body = {
+      answers,
+      participant_id: participantId ? parseInt(participantId) : null,
+      group_id: groupId ? parseInt(groupId) : null,
+    };
+
+    const r = await fetch(API + '/narrative-status/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const data = await r.json();
+    if (data.success) {
+      document.getElementById('progress').style.width = '100%';
+      document.getElementById('progress-txt').textContent = '13 / 13';
+      showScreen('screen-finish');
+    } else {
+      throw new Error(data.error || 'Ошибка сервера');
+    }
+  } catch (err) {
+    document.getElementById('error-detail').textContent = err.message;
+    showScreen('screen-error');
+  }
+}
+</script>
+</body>
+</html>
