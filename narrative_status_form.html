@@ -218,18 +218,14 @@ async function verifyCode() {
       body: JSON.stringify({code}),
     });
     const data = await r.json();
-    if (data.valid && data.test_type === 'narrative_status') {
+    if (data.valid) {
       accessCode = code;
       participantId = data.participant_id || null;
-      groupId = data.group_id || null;
-      const name = data.name ? data.name.split(' ')[0] : '';
+      groupId = data.groupId || null;
+      const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
       document.getElementById('intro-title').textContent =
         name ? 'Здравствуйте, ' + name + '!' : 'Нарративный статус';
       showScreen('screen-intro');
-    } else if (data.valid && data.test_type !== 'narrative_status') {
-      document.getElementById('login-error').textContent = 'Этот код предназначен для другого теста.';
-      document.getElementById('login-error').style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Войти →';
     } else {
       document.getElementById('login-error').style.display = 'block';
       btn.disabled = false; btn.textContent = 'Войти →';
