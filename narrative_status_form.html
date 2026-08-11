@@ -92,6 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 .finish-icon{font-size:56px;margin-bottom:24px}
 .finish-wrap h2{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:12px}
 .finish-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7}
+  @keyframes ns-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -159,6 +160,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 </div>
 
 <!-- ФИНИШ -->
+<div class="screen" id="screen-loading">
+  <div class="finish-wrap">
+    <div class="finish-icon" style="animation: ns-spin 1.6s linear infinite">🔮</div>
+    <h2>Анализируем ваши ответы…</h2>
+    <p>Это может занять до минуты — мы собираем ваш нарративный статус.<br><br>
+    Пожалуйста, не закрывайте страницу и не нажимайте назад.</p>
+  </div>
+</div>
+
 <div class="screen" id="screen-finish">
   <div class="finish-wrap">
     <div class="finish-icon">✅</div>
@@ -301,6 +311,7 @@ function goNext() {
 async function submitForm() {
   const btn = document.getElementById('btn-next');
   btn.disabled = true; btn.textContent = 'Отправляем…';
+  showScreen('screen-loading');
   try {
     const body = {
       answers,
