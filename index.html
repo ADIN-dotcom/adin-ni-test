@@ -216,18 +216,7 @@ p{color:var(--ink-soft);font-size:15px}
       <p id="reg-info">Заполнение дополнительных полей помогает нам улучшить инструмент
         и сделать ваш отчёт более точным. Все поля кроме имени и email необязательны.</p>
     </div>
-    <div class="row2">
-      <div class="field">
-        <label id="lbl-name">Имя <span style="color:var(--accent)">*</span></label>
-        <input id="r-name" type="text" placeholder="Ваше имя">
-        <div id="r-name-e" class="errmsg">Введите имя</div>
-      </div>
-      <div class="field">
-        <label id="lbl-email">Email <span style="color:var(--accent)">*</span></label>
-        <input id="r-email" type="email" placeholder="you@example.com">
-        <div id="r-email-e" class="errmsg">Введите корректный email</div>
-      </div>
-    </div>
+    <!-- Поля «Имя» и «Email» удалены: обезличенная модель (Вариант A). Идентификация — у фасилитатора. -->
     <div class="row2">
       <div class="field">
         <label id="lbl-gender">Пол</label>
@@ -752,12 +741,6 @@ function applyLanguage(lang) {
   $('reg-title').textContent = ui.reg_title;
   $('reg-sub').textContent = ui.reg_sub;
   $('reg-info').textContent = ui.reg_info;
-  $('lbl-name').firstChild.textContent = ui.lbl_name + ' ';
-  $('lbl-email').firstChild.textContent = ui.lbl_email + ' ';
-  $('r-name').placeholder = ui.name_placeholder;
-  $('r-name-e').textContent = ui.name_err;
-  $('r-email').placeholder = ui.email_placeholder;
-  $('r-email-e').textContent = ui.email_err;
   $('consent-text').firstChild.textContent = ui.consent_text;
   $('r-consent-e').textContent = ui.consent_err;
   $('btn-start-test').textContent = ui.btn_start_test;
@@ -821,7 +804,6 @@ function saveLocal() {
   try {
     localStorage.setItem('adin_test', JSON.stringify({
       sessionId: S.sessionId, codeId: S.codeId, language: S.language,
-      name: S.name, email: S.email,
       a1: S.a1, a2: S.a2, a3: S.a3,
       ts: Date.now()
     }));
@@ -877,14 +859,16 @@ async function checkCode() {
     // экрана регистрации, чтобы не было вспышки неправильного языка.
     applyLanguage(d.language || 'ru');
 
-    if (d.invitedEmail) {
-      $('r-email').value = d.invitedEmail;
-      $('r-email').readOnly = true;
-      $('r-email').style.background = 'var(--cream)';
-      $('r-email').style.color = 'var(--ink-soft)';
-      $('r-email').title = 'Email задан приглашением и не может быть изменён';
-    }
-    if (d.invitedName)  $('r-name').value  = d.invitedName;
+    // Единая анкета (обезличенно): если у кода уже есть интейк+согласие —
+    // пропускаем экран анкеты и сразу начинаем тест.
+    try {
+      const ir = await fetch(API + '/test/intake/' + encodeURIComponent(raw));
+      const iv = await ir.json();
+      if (iv && iv.hasIntake && iv.consent) {
+        await beginTest(iv.data || {});
+        return;
+      }
+    } catch (e) { /* нет сети/эндпоинта — покажем анкету как обычно */ }
     go('screen-reg');
 
   } catch(e) {
@@ -898,46 +882,51 @@ async function checkCode() {
 // ШАГ 2: РЕГИСТРАЦИЯ
 // ═══════════════════════════════════════════════════════════════
 async function startTest() {
-  const name    = $('r-name').value.trim();
-  const email   = $('r-email').value.trim();
   const consent = $('r-consent').checked;
-  let ok = true;
+  const ve = (id, cond) => { $(id).classList[cond ? 'remove' : 'add']('on'); return cond; };
+  if (!ve('r-consent-e', consent)) return;
 
-  // Валидация
-  const ve = (id, cond) => {
-    $(id).classList[cond ? 'remove' : 'add']('on');
-    if (!cond) ok = false;
+  const demo = {
+    country:    $('r-country').value,
+    field:      $('r-field').value,
+    gender:     $('r-gender').value,
+    age:        $('r-age').value,
+    marital:    $('r-marital').value,
+    children:   $('r-children').value,
+    education:  $('r-education').value,
+    eduField:   $('r-edu-field').value,
+    langNative: $('r-lang-native').value,
+    langAdd:    $('r-lang-add').value,
   };
-  ve('r-name-e',    !!name);
-  ve('r-email-e',   !!(email && email.includes('@') && email.includes('.')));
-  ve('r-consent-e', consent);
-  if (!ok) return;
 
-  S.name  = name;
-  S.email = email;
-  const country    = $('r-country').value;
-  const field      = $('r-field').value;
-  const gender     = $('r-gender').value;
-  const age        = $('r-age').value;
-  const marital    = $('r-marital').value;
-  const children   = $('r-children').value;
-  const education  = $('r-education').value;
-  const eduField   = $('r-edu-field').value;
-  const langNative = $('r-lang-native').value;
-  const langAdd    = $('r-lang-add').value;
+  // Единая анкета: сохраняем интейк + общее согласие один раз на код,
+  // чтобы последующие тесты с этим кодом не спрашивали повторно.
+  try {
+    await fetch(API + '/test/intake', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ code: $('inp-code').value, ...demo, consent: true }),
+    });
+  } catch (e) { /* нет сети — не критично */ }
 
+  await beginTest(demo);
+}
+
+// Создание сессии и переход к вопросам — общий путь (после анкеты и при её пропуске)
+async function beginTest(demo) {
+  demo = demo || {};
   const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
-
   try {
     const r = await fetch(API + '/test/start', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        codeId: S.codeId, name, email, country, field,
-        gender, age, marital, children, education, eduField,
-        langNative, langAdd,
+        codeId: S.codeId,
+        country: demo.country, field: demo.field,
+        gender: demo.gender, age: demo.age, marital: demo.marital, children: demo.children,
+        education: demo.education, eduField: demo.eduField,
+        langNative: demo.langNative, langAdd: demo.langAdd,
         consent: true, deviceType: device,
-        // Системные данные — фиксируем время начала
         startedAt: new Date().toISOString(),
       })
     });
@@ -945,7 +934,6 @@ async function startTest() {
     if (d.error) { alert('Ошибка: ' + d.error); return; }
     S.sessionId = d.sessionId;
   } catch(e) {
-    // Сервер недоступен — создаём временный ID, данные отправим при submit
     S.sessionId = 'local-' + Date.now();
   }
 
