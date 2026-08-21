@@ -391,6 +391,7 @@ p{color:var(--ink-soft);font-size:15px}
     <p style="margin-bottom:8px" id="thanks-sub1">Спасибо за участие!</p>
     <p id="thanks-sub2">Ваш краткий результат — ниже.</p>
     <div id="thanks-report" style="text-align:left;margin:8px auto 24px"></div>
+    <button class="btn btn-primary btn-lg" style="margin-bottom:20px" onclick="downloadReportPdf()">Скачать PDF-отчёт</button>
     <div class="thank-box">
       <h3 id="thanks-next-title">Что дальше?</h3>
       <p id="thanks-next-text">Более подробное объяснение результатов и персональные рекомендации
@@ -1109,6 +1110,17 @@ async function submitTest() {
 }
 
 // Краткий (express) отчёт на экране — Вариант B, без email.
+// Экспресс-PDF участнику (Вариант B, без письма) — скачивание с сервера по sessionId.
+function downloadReportPdf() {
+  if (!S.sessionId || String(S.sessionId).indexOf('local-') === 0) {
+    alert(S.language === 'en'
+      ? 'PDF is unavailable (no connection during submission).'
+      : 'PDF недоступен (не было соединения при отправке).');
+    return;
+  }
+  window.open(API + '/test/report-pdf/' + encodeURIComponent(S.sessionId), '_blank');
+}
+
 function renderShortReport(report) {
   const el = $('thanks-report');
   if (!el) return;
