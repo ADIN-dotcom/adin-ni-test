@@ -216,18 +216,7 @@ p{color:var(--ink-soft);font-size:15px}
       <p id="reg-info">Заполнение дополнительных полей помогает нам улучшить инструмент
         и сделать ваш отчёт более точным. Все поля кроме имени и email необязательны.</p>
     </div>
-    <div class="row2">
-      <div class="field">
-        <label id="lbl-name">Имя <span style="color:var(--accent)">*</span></label>
-        <input id="r-name" type="text" placeholder="Ваше имя">
-        <div id="r-name-e" class="errmsg">Введите имя</div>
-      </div>
-      <div class="field">
-        <label id="lbl-email">Email <span style="color:var(--accent)">*</span></label>
-        <input id="r-email" type="email" placeholder="you@example.com">
-        <div id="r-email-e" class="errmsg">Введите корректный email</div>
-      </div>
-    </div>
+    <!-- Поля «Имя» и «Email» удалены: обезличенная модель (Вариант A). Идентификация — у фасилитатора. -->
     <div class="row2">
       <div class="field">
         <label id="lbl-gender">Пол</label>
@@ -278,19 +267,10 @@ p{color:var(--ink-soft);font-size:15px}
         <select id="r-lang-add"></select>
       </div>
     </div>
-    <div class="field">
-      <label id="lbl-religion">Культурная или религиозная традиция
-        <span style="font-weight:400;font-size:11px;color:var(--ink-faint)" id="note-religion">
-          — не обязательно по степени веры
-        </span>
-      </label>
-      <select id="r-religion"></select>
-    </div>
+    <!-- Поле «религия» удалено: данные особой категории (ст. 9 GDPR). -->
     <label class="consent">
       <input type="checkbox" id="r-consent">
-      <span id="consent-text">Я согласен(а) на обработку персональных данных в исследовательских целях
-        Association de l'Intelligence Narrative® согласно GDPR.
-        Данные не передаются третьим лицам.</span>
+      <span id="consent-text">Я согласен(а) на обработку моих ответов и указанных данных в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Данные обрабатываются нашими поставщиками услуг, в том числе за пределами ЕС, с мерами защиты; подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
     </label>
     <div id="r-consent-e" class="errmsg">Необходимо согласие для продолжения</div>
     <div style="text-align:right;margin-top:20px">
@@ -409,8 +389,8 @@ p{color:var(--ink-soft);font-size:15px}
     <div class="thank-icon">✅</div>
     <h2 style="margin-bottom:12px" id="thanks-title">Тест завершён</h2>
     <p style="margin-bottom:8px" id="thanks-sub1">Спасибо за участие!</p>
-    <p id="thanks-sub2">Ваш персональный отчёт будет выслан на</p>
-    <p style="margin:8px 0 24px;font-size:18px;font-weight:700;color:var(--navy)" id="thanks-email"></p>
+    <p id="thanks-sub2">Ваш краткий результат — ниже.</p>
+    <div id="thanks-report" style="text-align:left;margin:8px auto 24px"></div>
     <div class="thank-box">
       <h3 id="thanks-next-title">Что дальше?</h3>
       <p id="thanks-next-text">Более подробное объяснение результатов и персональные рекомендации
@@ -460,7 +440,7 @@ const CONTENT = {
       lbl_name: "Имя", lbl_email: "Email",
       name_placeholder: "Ваше имя", name_err: "Введите имя",
       email_placeholder: "you@example.com", email_err: "Введите корректный email",
-      consent_text: "Я согласен(а) на обработку персональных данных в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Данные не передаются третьим лицам.",
+      consent_text: "Я согласен(а) на обработку моих ответов и указанных данных в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Данные обрабатываются нашими поставщиками услуг, в том числе за пределами ЕС, с мерами защиты; подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.",
       consent_err: "Необходимо согласие для продолжения",
       btn_start_test: "Начать тест →",
       b1_label: "Блок 1 · Стиль мышления",
@@ -478,7 +458,7 @@ const CONTENT = {
       loading_sub: "Пожалуйста, не закрывайте страницу.",
       thanks_title: "Тест завершён",
       thanks_sub1: "Спасибо за участие!",
-      thanks_sub2: "Ваш персональный отчёт будет выслан на",
+      thanks_sub2: "Ваш краткий результат — ниже.",
       thanks_next_title: "Что дальше?",
       thanks_next_text: "Более подробное объяснение результатов и персональные рекомендации вы можете получить у специалиста, имеющего сертификацию ADIN.",
       error_title: "Ошибка отправки",
@@ -577,7 +557,7 @@ const CONTENT = {
       lbl_name: "Name", lbl_email: "Email",
       name_placeholder: "Your name", name_err: "Please enter your name",
       email_placeholder: "you@example.com", email_err: "Please enter a valid email address",
-      consent_text: "I consent to the processing of my personal data for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. Data is not shared with third parties.",
+      consent_text: "I consent to the processing of my answers and the data I provide for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. Data is processed by our service providers, including outside the EU, with appropriate safeguards; see the Privacy Policy. I can withdraw consent and request deletion.",
       consent_err: "Consent is required to continue",
       btn_start_test: "Start the test →",
       b1_label: "Block 1 · Thinking Style",
@@ -595,7 +575,7 @@ const CONTENT = {
       loading_sub: "Please don't close this page.",
       thanks_title: "Test completed",
       thanks_sub1: "Thank you for participating!",
-      thanks_sub2: "Your personal report will be sent to",
+      thanks_sub2: "Your short result is below.",
       thanks_next_title: "What's next?",
       thanks_next_text: "For a more detailed explanation of your results and personal recommendations, you can consult a certified ADIN specialist.",
       error_title: "Submission error",
@@ -761,12 +741,6 @@ function applyLanguage(lang) {
   $('reg-title').textContent = ui.reg_title;
   $('reg-sub').textContent = ui.reg_sub;
   $('reg-info').textContent = ui.reg_info;
-  $('lbl-name').firstChild.textContent = ui.lbl_name + ' ';
-  $('lbl-email').firstChild.textContent = ui.lbl_email + ' ';
-  $('r-name').placeholder = ui.name_placeholder;
-  $('r-name-e').textContent = ui.name_err;
-  $('r-email').placeholder = ui.email_placeholder;
-  $('r-email-e').textContent = ui.email_err;
   $('consent-text').firstChild.textContent = ui.consent_text;
   $('r-consent-e').textContent = ui.consent_err;
   $('btn-start-test').textContent = ui.btn_start_test;
@@ -781,8 +755,6 @@ function applyLanguage(lang) {
   $('lbl-field').textContent = form.field.label;
   $('lbl-langNative').textContent = form.langNative.label;
   $('lbl-langAdd').textContent = form.langAdd.label;
-  $('lbl-religion').firstChild.textContent = form.religion.label + ' ';
-  $('note-religion').textContent = '— ' + form.religion.note;
 
   populateSelect($('r-gender'), form.gender);
   populateSelect($('r-age'), form.age);
@@ -794,7 +766,6 @@ function applyLanguage(lang) {
   populateSelect($('r-field'), form.field);
   populateSelect($('r-lang-native'), form.langNative);
   populateSelect($('r-lang-add'), form.langAdd);
-  populateSelect($('r-religion'), form.religion);
 
   // Блоки вопросов
   $('b1-block-label').textContent = ui.b1_label;
@@ -833,7 +804,6 @@ function saveLocal() {
   try {
     localStorage.setItem('adin_test', JSON.stringify({
       sessionId: S.sessionId, codeId: S.codeId, language: S.language,
-      name: S.name, email: S.email,
       a1: S.a1, a2: S.a2, a3: S.a3,
       ts: Date.now()
     }));
@@ -889,14 +859,16 @@ async function checkCode() {
     // экрана регистрации, чтобы не было вспышки неправильного языка.
     applyLanguage(d.language || 'ru');
 
-    if (d.invitedEmail) {
-      $('r-email').value = d.invitedEmail;
-      $('r-email').readOnly = true;
-      $('r-email').style.background = 'var(--cream)';
-      $('r-email').style.color = 'var(--ink-soft)';
-      $('r-email').title = 'Email задан приглашением и не может быть изменён';
-    }
-    if (d.invitedName)  $('r-name').value  = d.invitedName;
+    // Единая анкета (обезличенно): если у кода уже есть интейк+согласие —
+    // пропускаем экран анкеты и сразу начинаем тест.
+    try {
+      const ir = await fetch(API + '/test/intake/' + encodeURIComponent(raw));
+      const iv = await ir.json();
+      if (iv && iv.hasIntake && iv.consent) {
+        await beginTest(iv.data || {});
+        return;
+      }
+    } catch (e) { /* нет сети/эндпоинта — покажем анкету как обычно */ }
     go('screen-reg');
 
   } catch(e) {
@@ -910,47 +882,51 @@ async function checkCode() {
 // ШАГ 2: РЕГИСТРАЦИЯ
 // ═══════════════════════════════════════════════════════════════
 async function startTest() {
-  const name    = $('r-name').value.trim();
-  const email   = $('r-email').value.trim();
   const consent = $('r-consent').checked;
-  let ok = true;
+  const ve = (id, cond) => { $(id).classList[cond ? 'remove' : 'add']('on'); return cond; };
+  if (!ve('r-consent-e', consent)) return;
 
-  // Валидация
-  const ve = (id, cond) => {
-    $(id).classList[cond ? 'remove' : 'add']('on');
-    if (!cond) ok = false;
+  const demo = {
+    country:    $('r-country').value,
+    field:      $('r-field').value,
+    gender:     $('r-gender').value,
+    age:        $('r-age').value,
+    marital:    $('r-marital').value,
+    children:   $('r-children').value,
+    education:  $('r-education').value,
+    eduField:   $('r-edu-field').value,
+    langNative: $('r-lang-native').value,
+    langAdd:    $('r-lang-add').value,
   };
-  ve('r-name-e',    !!name);
-  ve('r-email-e',   !!(email && email.includes('@') && email.includes('.')));
-  ve('r-consent-e', consent);
-  if (!ok) return;
 
-  S.name  = name;
-  S.email = email;
-  const country    = $('r-country').value;
-  const field      = $('r-field').value;
-  const gender     = $('r-gender').value;
-  const age        = $('r-age').value;
-  const marital    = $('r-marital').value;
-  const children   = $('r-children').value;
-  const education  = $('r-education').value;
-  const eduField   = $('r-edu-field').value;
-  const langNative = $('r-lang-native').value;
-  const langAdd    = $('r-lang-add').value;
-  const religion   = $('r-religion').value;
+  // Единая анкета: сохраняем интейк + общее согласие один раз на код,
+  // чтобы последующие тесты с этим кодом не спрашивали повторно.
+  try {
+    await fetch(API + '/test/intake', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ code: $('inp-code').value, ...demo, consent: true }),
+    });
+  } catch (e) { /* нет сети — не критично */ }
 
+  await beginTest(demo);
+}
+
+// Создание сессии и переход к вопросам — общий путь (после анкеты и при её пропуске)
+async function beginTest(demo) {
+  demo = demo || {};
   const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
-
   try {
     const r = await fetch(API + '/test/start', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        codeId: S.codeId, name, email, country, field,
-        gender, age, marital, children, education, eduField,
-        langNative, langAdd, religion,
+        codeId: S.codeId,
+        country: demo.country, field: demo.field,
+        gender: demo.gender, age: demo.age, marital: demo.marital, children: demo.children,
+        education: demo.education, eduField: demo.eduField,
+        langNative: demo.langNative, langAdd: demo.langAdd,
         consent: true, deviceType: device,
-        // Системные данные — фиксируем время начала
         startedAt: new Date().toISOString(),
       })
     });
@@ -958,7 +934,6 @@ async function startTest() {
     if (d.error) { alert('Ошибка: ' + d.error); return; }
     S.sessionId = d.sessionId;
   } catch(e) {
-    // Сервер недоступен — создаём временный ID, данные отправим при submit
     S.sessionId = 'local-' + Date.now();
   }
 
@@ -1125,12 +1100,49 @@ async function submitTest() {
     // Очищаем localStorage после успешной отправки
     try { localStorage.removeItem('adin_test'); } catch(e) {}
 
-    $('thanks-email').textContent = S.email;
+    renderShortReport(d.report);
     go('screen-thanks');
 
   } catch(e) {
     showError('Нет соединения с сервером.');
   }
+}
+
+// Краткий (express) отчёт на экране — Вариант B, без email.
+function renderShortReport(report) {
+  const el = $('thanks-report');
+  if (!el) return;
+  const en = (typeof S !== 'undefined' && S.language === 'en');
+  if (!report) {
+    el.innerHTML = '<p>' + (en ? 'Result is being processed. Please contact your facilitator.'
+                                : 'Результат обрабатывается. Обратитесь к вашему фасилитатору.') + '</p>';
+    return;
+  }
+  const c = report.competencies || {};
+  const t = {
+    thinking: en ? 'Thinking type' : 'Тип мышления',
+    maturity: en ? 'Maturity level' : 'Уровень зрелости',
+    overall:  en ? 'Overall score' : 'Общий балл',
+    comps:    en ? 'Competencies' : 'Компетенции',
+    aware: en ? 'Awareness' : 'Осознанность',
+    author: en ? 'Authorship' : 'Авторство',
+    reson: en ? 'Resonance' : 'Резонанс',
+    refr: en ? 'Reframing' : 'Рефрейминг',
+    embod: en ? 'Embodiment' : 'Воплощение',
+  };
+  const row = (label, o) => (o && typeof o.score === 'number')
+    ? '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>' + label + '</span><b>' + o.score + '</b></div>'
+    : '';
+  el.innerHTML =
+    '<div style="border:1px solid #ddd;border-radius:12px;padding:16px">' +
+      (report.dominantType ? '<p><b>' + t.thinking + ':</b> ' + (report.dominantType.name || report.dominantType.key || '') + '</p>' : '') +
+      (report.maturityLevelName ? '<p><b>' + t.maturity + ':</b> ' + report.maturityLevelName + '</p>' : '') +
+      (typeof report.overallScore === 'number' ? '<p><b>' + t.overall + ':</b> ' + report.overallScore + '</p>' : '') +
+      '<hr style="border:none;border-top:1px solid #eee;margin:10px 0">' +
+      '<p style="font-weight:700;margin-bottom:6px">' + t.comps + '</p>' +
+      row(t.aware, c.awareness) + row(t.author, c.authorship) + row(t.reson, c.resonance) +
+      row(t.refr, c.reframing) + row(t.embod, c.embodiment) +
+    '</div>';
 }
 
 async function retrySubmit() {
