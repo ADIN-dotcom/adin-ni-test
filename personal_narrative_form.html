@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Личный нарратив · ADIN</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1E3A5F;--navy-mid:#2d5a8e;--navy-s:#dce8f5;
+  --cream:#f8f6f0;--cream-d:#ede8df;
+  --ink:#1a1a2e;--ink-soft:#4a4a6a;--ink-faint:#8888a8;
+  --green:#2D6A4F;--green-s:#e8f3ec;
+  --red:#C8432A;--red-s:#fee2e2;
+  --gold:#c9a84c;--gold-s:#fff8e1;
+  --white:#fff;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  background:var(--cream);color:var(--ink);min-height:100vh;
+  display:flex;flex-direction:column}
+
+.header{background:var(--navy);padding:16px 24px;display:flex;
+  align-items:center;justify-content:space-between}
+.logo{color:#fff;font-size:20px;font-weight:700;letter-spacing:.02em}
+.logo-sub{color:#9aafc8;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.progress-wrap{display:flex;align-items:center;gap:10px}
+.progress-bar{width:160px;height:4px;background:rgba(255,255,255,.2);border-radius:2px}
+.progress-fill{height:100%;background:#fff;border-radius:2px;transition:width .4s}
+.progress-txt{color:#9aafc8;font-size:12px}
+
+.screen{display:none;flex:1;flex-direction:column}
+.screen.active{display:flex}
+
+/* ВХОД ПО КОДУ */
+.login-wrap{max-width:480px;margin:64px auto;padding:0 24px;text-align:center}
+.login-wrap h1{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.login-wrap p{font-size:15px;color:var(--ink-soft);line-height:1.7;margin-bottom:32px}
+.code-input{width:100%;padding:16px;text-align:center;font-size:24px;
+  font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  border:2px solid var(--cream-d);border-radius:10px;
+  font-family:inherit;color:var(--navy);background:#fff;transition:border .2s}
+.code-input:focus{outline:none;border-color:var(--navy)}
+.btn-enter{display:inline-block;margin-top:20px;width:100%;padding:14px;
+  background:var(--navy);color:#fff;border-radius:10px;font-size:16px;
+  font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:background .18s}
+.btn-enter:hover{background:var(--navy-mid)}
+.btn-enter:disabled{background:#b0bcc8;cursor:not-allowed}
+.login-error{color:var(--red);font-size:14px;margin-top:12px;display:none}
+
+/* ИНТРО */
+.intro-wrap{max-width:600px;margin:48px auto;padding:0 24px;text-align:center}
+.intro-wrap h1{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.intro-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7;margin-bottom:16px}
+.block-badges{display:flex;gap:10px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500}
+.badge-1{background:var(--navy-s);color:var(--navy)}
+.badge-2{background:var(--gold-s);color:#7b5800}
+.badge-3{background:var(--green-s);color:var(--green)}
+.btn-start{display:inline-block;padding:14px 36px;background:var(--navy);
+  color:#fff;border-radius:10px;font-size:16px;font-weight:500;
+  cursor:pointer;border:none;font-family:inherit;transition:background .18s}
+.btn-start:hover{background:var(--navy-mid)}
+
+/* ВОПРОСЫ */
+.q-wrap{max-width:680px;margin:0 auto;padding:32px 24px;flex:1;
+  display:flex;flex-direction:column}
+.q-block-label{font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:20px}
+.q-num{font-size:13px;color:var(--ink-faint);margin-bottom:8px}
+.q-text{font-size:20px;font-weight:500;color:var(--ink);line-height:1.5;margin-bottom:8px}
+.q-hint{font-size:13px;color:var(--ink-faint);font-style:italic;margin-bottom:24px;line-height:1.5}
+.q-input{width:100%;min-height:120px;padding:14px 16px;
+  border:2px solid var(--cream-d);border-radius:10px;
+  font-size:15px;font-family:inherit;color:var(--ink);
+  background:#fff;resize:vertical;line-height:1.6;transition:border .2s}
+.q-input:focus{outline:none;border-color:var(--navy)}
+.q-input.short{min-height:60px}
+.q-nav{display:flex;justify-content:space-between;align-items:center;
+  margin-top:24px;padding-top:20px;border-top:1px solid var(--cream-d)}
+.btn-nav{padding:11px 24px;border-radius:8px;font-size:15px;
+  font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .18s}
+.btn-back{background:var(--cream-d);color:var(--ink-soft)}
+.btn-back:hover{background:#e0dbd4}
+.btn-next{background:var(--navy);color:#fff}
+.btn-next:hover{background:var(--navy-mid)}
+.btn-next:disabled{background:#b0bcc8;cursor:not-allowed}
+.char-count{font-size:12px;color:var(--ink-faint)}
+.error-msg{color:var(--red);font-size:13px;margin-top:8px;display:none}
+
+/* ФИНИШ */
+.finish-wrap{max-width:560px;margin:64px auto;padding:0 24px;text-align:center}
+.finish-icon{font-size:56px;margin-bottom:24px}
+.finish-wrap h2{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.finish-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7}
+  @keyframes ns-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">ADIN</div>
+    <div class="logo-sub">Личный нарратив</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-txt" id="progress-txt"></div>
+  </div>
+</div>
+
+<!-- ВХОД ПО КОДУ -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <h1>Личный нарратив</h1>
+    <p>Введите код доступа из письма-приглашения</p>
+    <input class="code-input" id="code-input" type="text"
+      placeholder="ADIN-XXXX" maxlength="9"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')verifyCode()">
+    <div class="login-error" id="login-error">Код не найден. Проверьте письмо и попробуйте снова.</div>
+    <button class="btn-enter" id="btn-enter" onclick="verifyCode()">Войти →</button>
+  </div>
+</div>
+
+<!-- ИНТРО -->
+<div class="screen" id="screen-intro">
+  <div class="intro-wrap">
+    <h1 id="intro-title">Личный нарратив</h1>
+    <p>15 вопросов о том, как ваша личная история соотносится с историей семьи,
+    общества и времени, в котором мы живём.<br>
+    Нет правильных или неправильных ответов. Пишите первое что приходит.</p>
+    <div class="block-badges">
+      <span class="badge badge-1">① Личное · 2 вопроса</span>
+      <span class="badge badge-2">② Семья · 3 вопроса</span>
+      <span class="badge badge-3">③ Общество · 3 вопроса</span>
+      <span class="badge badge-1">④ Государство · 3 вопроса</span>
+      <span class="badge badge-2">⑤ Соотношение · 4 вопроса</span>
+    </div>
+    <p style="font-size:14px;color:var(--ink-faint)">Ориентировочное время — 12–18 минут</p>
+    <label style="display:flex;gap:10px;align-items:flex-start;text-align:left;margin:16px 0;font-size:13px;color:var(--ink-soft)">
+      <input type="checkbox" id="nsr-consent" style="margin-top:3px;width:17px;height:17px;flex-shrink:0">
+      <span>Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Данные обрабатываются нашими поставщиками услуг, в том числе за пределами ЕС, с мерами защиты; подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
+    </label>
+    <div id="nsr-consent-err" style="display:none;color:#c0392b;font-size:13px;margin-bottom:8px">Необходимо согласие для продолжения</div>
+    <button class="btn-start" onclick="startForm()">Начать</button>
+  </div>
+</div>
+
+<!-- ВОПРОСЫ -->
+<div class="screen" id="screen-questions">
+  <div class="q-wrap">
+    <div class="q-block-label" id="q-block"></div>
+    <div class="q-num" id="q-num"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-hint" id="q-hint"></div>
+    <textarea class="q-input" id="q-answer" placeholder="Ваш ответ..."
+      oninput="onInput()"></textarea>
+    <div class="error-msg" id="error-msg">Пожалуйста, напишите хотя бы несколько слов</div>
+    <div class="q-nav">
+      <button class="btn-nav btn-back" onclick="goBack()" id="btn-back">← Назад</button>
+      <div style="display:flex;align-items:center;gap:16px">
+        <span class="char-count" id="char-count"></span>
+        <button class="btn-nav btn-next" onclick="goNext()" id="btn-next">Далее →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ОЖИДАНИЕ -->
+<div class="screen" id="screen-loading">
+  <div class="finish-wrap">
+    <div class="finish-icon" style="animation: ns-spin 1.6s linear infinite">🔮</div>
+    <h2>Анализируем ваши ответы…</h2>
+    <p>Это может занять до минуты — мы собираем ваш личный нарративный статус.<br><br>
+    Пожалуйста, не закрывайте страницу и не нажимайте назад.</p>
+  </div>
+</div>
+
+<!-- ФИНИШ -->
+<div class="screen" id="screen-finish">
+  <div class="finish-wrap">
+    <div class="finish-icon">✅</div>
+    <h2>Спасибо!</h2>
+    <p>Ваши ответы получены и переданы специалисту.<br><br>
+    Результаты анализа будут использованы для индивидуальной работы с вашим нарративным статусом.</p>
+  </div>
+</div>
+
+<div class="screen" id="screen-error">
+  <div class="finish-wrap">
+    <div class="finish-icon">⚠️</div>
+    <h2>Что-то пошло не так</h2>
+    <p id="error-detail">Пожалуйста, свяжитесь с организатором программы.</p>
+  </div>
+</div>
+
+<script>
+const API = 'https://adin-ni-backend-production.up.railway.app/api';
+
+const QUESTIONS = [
+  {block:'① Личное',n:'01',text:'Если бы вашу жизнь описали жанром книги или фильма — какой это был бы жанр?',hint:'Первое, что приходит в голову.',short:true},
+  {block:'① Личное',n:'02',text:'Закончите предложение: «Моя жизнь — это история о том, как я…»',hint:'',short:false,prefix:'Моя жизнь — это история о том, как я '},
+  {block:'② Семья',n:'03',text:'Какую историю рассказывает о себе ваша семья — «кто мы такие»?',hint:'Что обычно говорят о семье, о её характере, о том, откуда вы.',short:false},
+  {block:'② Семья',n:'04',text:'Вспомните момент, когда вы поступили не так, как «полагалось бы» в истории вашей семьи. Что это было?',hint:'Конкретный случай, не общее ощущение.',short:false},
+  {block:'② Семья',n:'05',text:'Закончите предложение: «В истории моей семьи я…»',hint:'',short:false,prefix:'В истории моей семьи я '},
+  {block:'③ Общество',n:'06',text:'Если бы у вашего поколения или окружения была общая история о том, «что с нами сейчас происходит» — какой была бы эта история?',hint:'Как будто рассказываете сюжет со стороны.',short:false},
+  {block:'③ Общество',n:'07',text:'Какая роль в этой истории — ваша?',hint:'',short:false},
+  {block:'③ Общество',n:'08',text:'Вспомните последний раз, когда слово «общество» реально всплывало у вас в голове — в какой ситуации это было?',hint:'Конкретный момент, не абстрактное рассуждение.',short:false},
+  {block:'④ Государство',n:'09',text:'Какую историю рассказывают о времени, в котором мы живём, — в новостях, публичных выступлениях?',hint:'Как будто пересказываете чужими словами.',short:false},
+  {block:'④ Государство',n:'10',text:'Насколько то, что говорят о нашем времени, похоже на то, что происходит лично с вами?',hint:'',short:false},
+  {block:'④ Государство',n:'11',text:'Закончите предложение: «Когда я слышу, как говорят о нашем времени, я чувствую…»',hint:'',short:false,prefix:'Когда я слышу, как говорят о нашем времени, я чувствую '},
+  {block:'⑤ Соотношение',n:'12',text:'Совпадает ли ваша история с одной из трёх — семьи, общества, государства? Если да — с какой и в чём. Если нет — расскажите об этом тоже.',hint:'',short:false},
+  {block:'⑤ Соотношение',n:'13',text:'Есть ли конфликт между вашей историей и одной из трёх — семьи, общества, государства? Если да — с какой и в чём. Если нет — расскажите об этом тоже.',hint:'',short:false},
+  {block:'⑤ Соотношение',n:'14',text:'Какая из четырёх историй — ваша личная, семьи, общества или государства — сильнее всего влияет на ваши решения, и почему? Если ни одна не перевешивает — расскажите об этом тоже.',hint:'',short:false},
+  {block:'⑤ Соотношение',n:'15',text:'Если бы одну из этих историй можно было переписать — какую бы вы выбрали и что бы в ней изменили?',hint:'',short:false},
+];
+
+let current = 0;
+const answers = {};
+let participantId = null;
+let accessCode = null;
+
+async function verifyCode() {
+  const code = document.getElementById('code-input').value.trim().toUpperCase();
+  if (!code || code.length < 6) {
+    document.getElementById('login-error').style.display = 'block';
+    return;
+  }
+  const btn = document.getElementById('btn-enter');
+  btn.disabled = true; btn.textContent = 'Проверяем…';
+  document.getElementById('login-error').style.display = 'none';
+
+  try {
+    const r = await fetch(API + '/test/verify-code', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({code}),
+    });
+    const data = await r.json();
+    if (data.valid) {
+      accessCode = code;
+      participantId = data.participant_id || null;
+      const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
+      document.getElementById('intro-title').textContent =
+        name ? 'Здравствуйте, ' + name + '!' : 'Личный нарратив';
+      // Единое согласие: если уже дано под этим кодом — предотметим галочку.
+      try {
+        const ir = await fetch(API + '/test/intake/' + encodeURIComponent(code));
+        const iv = await ir.json();
+        if (iv && iv.consent) {
+          const cb = document.getElementById('nsr-consent');
+          if (cb) cb.checked = true;
+        }
+      } catch(e) {}
+      showScreen('screen-intro');
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Войти →';
+    }
+  } catch(e) {
+    document.getElementById('login-error').textContent = 'Ошибка соединения. Попробуйте позже.';
+    document.getElementById('login-error').style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Войти →';
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function startForm() {
+  const cb = document.getElementById('nsr-consent');
+  if (!cb || !cb.checked) {
+    document.getElementById('nsr-consent-err').style.display = 'block';
+    return;
+  }
+  // Единое согласие сохраняем на код (демографию не трогаем — COALESCE на бэкенде).
+  try {
+    await fetch(API + '/test/intake', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ code: accessCode, consent: true }),
+    });
+  } catch(e) { /* не критично */ }
+  showScreen('screen-questions');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-block').textContent = q.block;
+  document.getElementById('q-num').textContent = 'Вопрос ' + q.n + ' из 15';
+  document.getElementById('q-text').textContent = q.text;
+  const hint = document.getElementById('q-hint');
+  hint.textContent = q.hint || '';
+  hint.style.display = q.hint ? 'block' : 'none';
+
+  const ta = document.getElementById('q-answer');
+  ta.className = 'q-input' + (q.short ? ' short' : '');
+  ta.value = answers[q.n] || '';
+  if (q.prefix && !ta.value) ta.value = q.prefix;
+  ta.focus();
+
+  document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Отправить ✓' : 'Далее →';
+  document.getElementById('error-msg').style.display = 'none';
+  updateProgress();
+  updateCharCount();
+}
+
+function onInput() { updateCharCount(); document.getElementById('error-msg').style.display = 'none'; }
+
+function updateCharCount() {
+  const val = document.getElementById('q-answer').value.trim();
+  const q = QUESTIONS[current];
+  const prefix = q.prefix || '';
+  const actual = val.startsWith(prefix) ? val.slice(prefix.length) : val;
+  document.getElementById('char-count').textContent = actual.length > 0 ? actual.length + ' симв.' : '';
+}
+
+function updateProgress() {
+  const pct = Math.round((current / QUESTIONS.length) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('progress-txt').textContent = current + ' / ' + QUESTIONS.length;
+}
+
+function goBack() { if (current > 0) { current--; renderQuestion(); } }
+
+function goNext() {
+  const val = document.getElementById('q-answer').value.trim();
+  const q = QUESTIONS[current];
+  const prefix = q.prefix || '';
+  const actual = val.startsWith(prefix) ? val.slice(prefix.length).trim() : val;
+  if (actual.length < 2) { document.getElementById('error-msg').style.display = 'block'; return; }
+  answers[q.n] = val;
+  if (current < QUESTIONS.length - 1) { current++; renderQuestion(); }
+  else submitForm();
+}
+
+async function submitForm() {
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true; btn.textContent = 'Отправляем…';
+  showScreen('screen-loading');
+  try {
+    const body = {
+      answers,
+      code: accessCode,
+      participant_id: participantId,
+    };
+    const r = await fetch(API + '/personal-narrative/submit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (data.success) {
+      document.getElementById('progress').style.width = '100%';
+      document.getElementById('progress-txt').textContent = '15 / 15';
+      showScreen('screen-finish');
+    } else {
+      throw new Error(data.error || 'Ошибка сервера');
+    }
+  } catch(err) {
+    document.getElementById('error-detail').textContent = err.message;
+    showScreen('screen-error');
+  }
+}
+</script>
+</body>
+</html>
