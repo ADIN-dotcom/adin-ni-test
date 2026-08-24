@@ -218,6 +218,7 @@ const QUESTIONS = [
 let current = 0;
 const answers = {};
 let participantId = null;
+let groupId = null;
 let accessCode = null;
 
 async function verifyCode() {
@@ -240,6 +241,7 @@ async function verifyCode() {
     if (data.valid) {
       accessCode = code;
       participantId = data.participant_id || null;
+      groupId = data.groupId || null;
       const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
       document.getElementById('intro-title').textContent =
         name ? 'Здравствуйте, ' + name + '!' : 'Личный нарратив';
@@ -347,6 +349,7 @@ async function submitForm() {
       answers,
       code: accessCode,
       participant_id: participantId,
+      group_id: groupId,
     };
     const r = await fetch(API + '/personal-narrative/submit', {
       method: 'POST',
