@@ -137,6 +137,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
       <span class="badge badge-2">⑤ Соотношение · 4 вопроса</span>
     </div>
     <p style="font-size:14px;color:var(--ink-faint)">Ориентировочное время — 12–18 минут</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin:20px 0 8px">
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Пол</label><select id="r-gender" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Возраст</label><select id="r-age" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Семейное положение</label><select id="r-marital" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Есть ли у вас дети?</label><select id="r-children" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Уровень образования</label><select id="r-education" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Направление образования</label><select id="r-edu-field" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Страна</label><select id="r-country" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Сфера деятельности</label><select id="r-field" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Родной язык</label><select id="r-lang-native" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Дополнительный язык</label><select id="r-lang-add" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+    </div>
     <label style="display:flex;gap:10px;align-items:flex-start;text-align:left;margin:16px 0;font-size:13px;color:var(--ink-soft)">
       <input type="checkbox" id="nsr-consent" style="margin-top:3px;width:17px;height:17px;flex-shrink:0">
       <span>Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Данные обрабатываются нашими поставщиками услуг, в том числе за пределами ЕС, с мерами защиты; подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
@@ -254,6 +266,7 @@ async function verifyCode() {
           if (cb) cb.checked = true;
         }
       } catch(e) {}
+      populateRegForm();
       showScreen('screen-intro');
     } else {
       document.getElementById('login-error').style.display = 'block';
@@ -271,18 +284,81 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
+const REG_FORM = {
+  gender: { options: ["Мужской","Женский","Предпочитаю не указывать"] },
+  age: { options: ["До 25 лет","25–34","35–44","45–54","55–64","65 и старше","Предпочитаю не указывать"] },
+  marital: { options: ["Не состою в отношениях","В отношениях","В браке","Разведён(а)","Вдовец / вдова","Предпочитаю не отвечать"] },
+  children: { options: ["Нет","Да"] },
+  education: { options: ["Среднее","Среднее специальное","Высшее (бакалавр)","Высшее (магистр)","Учёная степень (PhD, MD)","Другое"] },
+  eduField: { options: ["Технические науки","Естественные науки","Социальные науки","Гуманитарные науки","Экономика и бизнес","Искусство и дизайн","Медицина","Военное дело","Другое"] },
+  country: {
+    groups: {
+      "СНГ": ["Россия","Армения","Казахстан","Беларусь","Украина","Узбекистан","Азербайджан","Молдова","Кыргызстан","Таджикистан","Туркменистан"],
+      "Европа (не ЕС)": ["Грузия","Швейцария","Великобритания","Норвегия","Исландия","Лихтенштейн","Сербия","Черногория"],
+      "Европейский союз": ["Австрия","Бельгия","Болгария","Венгрия","Германия","Греция","Дания","Ирландия","Испания","Италия","Кипр","Латвия","Литва","Люксембург","Мальта","Нидерланды","Польша","Португалия","Румыния","Словакия","Словения","Финляндия","Франция","Хорватия","Чехия","Швеция","Эстония"],
+      "Другие регионы": ["Аргентина","Бахрейн","Бразилия","Израиль","Канада","Китай","Мексика","ОАЭ","США","Турция"],
+    },
+    other: "Другая",
+  },
+  field: { options: ["Менеджмент / Управление","Образование / Наука","Консультирование / Коучинг","Предпринимательство","HR / Организационное развитие","Медицина / Здравоохранение","Право / Финансы","Творческие профессии","Другое"] },
+  langNative: { options: ["Русский","Французский","Грузинский","Казахский","Английский","Армянский","Арабский","Испанский","Немецкий","Китайский","Другой"] },
+  langAdd: { options: ["Русский","Французский","Грузинский","Казахский","Английский","Армянский","Арабский","Испанский","Немецкий","Китайский","Другой","Нет"] },
+};
+
+function populateSelect(selEl, cfg) {
+  selEl.innerHTML = '';
+  const ph = document.createElement('option');
+  ph.value = ''; ph.textContent = 'Выберите...';
+  selEl.appendChild(ph);
+  if (cfg.groups) {
+    Object.entries(cfg.groups).forEach(([groupLabel, opts]) => {
+      const og = document.createElement('optgroup');
+      og.label = groupLabel;
+      opts.forEach(o => { const opt = document.createElement('option'); opt.textContent = o; og.appendChild(opt); });
+      selEl.appendChild(og);
+    });
+    if (cfg.other) { const opt = document.createElement('option'); opt.textContent = cfg.other; selEl.appendChild(opt); }
+  } else {
+    cfg.options.forEach(o => { const opt = document.createElement('option'); opt.textContent = o; selEl.appendChild(opt); });
+  }
+}
+
+function populateRegForm() {
+  populateSelect(document.getElementById('r-gender'), REG_FORM.gender);
+  populateSelect(document.getElementById('r-age'), REG_FORM.age);
+  populateSelect(document.getElementById('r-marital'), REG_FORM.marital);
+  populateSelect(document.getElementById('r-children'), REG_FORM.children);
+  populateSelect(document.getElementById('r-education'), REG_FORM.education);
+  populateSelect(document.getElementById('r-edu-field'), REG_FORM.eduField);
+  populateSelect(document.getElementById('r-country'), REG_FORM.country);
+  populateSelect(document.getElementById('r-field'), REG_FORM.field);
+  populateSelect(document.getElementById('r-lang-native'), REG_FORM.langNative);
+  populateSelect(document.getElementById('r-lang-add'), REG_FORM.langAdd);
+}
+
 async function startForm() {
   const cb = document.getElementById('nsr-consent');
   if (!cb || !cb.checked) {
     document.getElementById('nsr-consent-err').style.display = 'block';
     return;
   }
-  // Единое согласие сохраняем на код (демографию не трогаем — COALESCE на бэкенде).
+  const demo = {
+    gender:     document.getElementById('r-gender').value,
+    age:        document.getElementById('r-age').value,
+    marital:    document.getElementById('r-marital').value,
+    children:   document.getElementById('r-children').value,
+    education:  document.getElementById('r-education').value,
+    eduField:   document.getElementById('r-edu-field').value,
+    country:    document.getElementById('r-country').value,
+    field:      document.getElementById('r-field').value,
+    langNative: document.getElementById('r-lang-native').value,
+    langAdd:    document.getElementById('r-lang-add').value,
+  };
   try {
     await fetch(API + '/test/intake', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ code: accessCode, consent: true }),
+      body: JSON.stringify({ code: accessCode, ...demo, consent: true }),
     });
   } catch(e) { /* не критично */ }
   showScreen('screen-questions');
