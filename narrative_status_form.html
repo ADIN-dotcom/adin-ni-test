@@ -135,16 +135,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     </div>
     <p style="font-size:14px;color:var(--ink-faint)">Ориентировочное время — 10–15 минут</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin:20px 0 8px">
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Пол</label><select id="r-gender" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Возраст</label><select id="r-age" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Семейное положение</label><select id="r-marital" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Есть ли у вас дети?</label><select id="r-children" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Уровень образования</label><select id="r-education" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Направление образования</label><select id="r-edu-field" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Страна</label><select id="r-country" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Сфера деятельности</label><select id="r-field" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Родной язык</label><select id="r-lang-native" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
-      <div class="field"><label style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Дополнительный язык</label><select id="r-lang-add" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-gender" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Пол</label><select id="r-gender" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-age" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Возраст</label><select id="r-age" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-marital" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Семейное положение</label><select id="r-marital" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-children" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Есть ли у вас дети?</label><select id="r-children" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-education" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Уровень образования</label><select id="r-education" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-eduField" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Направление образования</label><select id="r-edu-field" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-country" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Страна</label><select id="r-country" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-field" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Сфера деятельности</label><select id="r-field" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-langNative" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Родной язык</label><select id="r-lang-native" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
+      <div class="field"><label id="lbl-langAdd" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Дополнительный язык</label><select id="r-lang-add" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
     </div>
     <label style="display:flex;gap:10px;align-items:flex-start;text-align:left;margin:16px 0;font-size:13px;color:var(--ink-soft)">
       <input type="checkbox" id="nsr-consent" style="margin-top:3px;width:17px;height:17px;flex-shrink:0">
@@ -260,7 +260,7 @@ async function verifyCode() {
           if (cb) cb.checked = true;
         }
       } catch(e) {}
-      populateRegForm();
+      populateRegForm('ru'); // TODO(МНОГО Лингва): передавать сюда data.language, когда формы научатся его читать
       showScreen('screen-intro');
     } else {
       document.getElementById('login-error').style.display = 'block';
@@ -278,31 +278,50 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-const REG_FORM = {
-  gender: { options: ["Мужской","Женский","Предпочитаю не указывать"] },
-  age: { options: ["До 25 лет","25–34","35–44","45–54","55–64","65 и старше","Предпочитаю не указывать"] },
-  marital: { options: ["Не состою в отношениях","В отношениях","В браке","Разведён(а)","Вдовец / вдова","Предпочитаю не отвечать"] },
-  children: { options: ["Нет","Да"] },
-  education: { options: ["Среднее","Среднее специальное","Высшее (бакалавр)","Высшее (магистр)","Учёная степень (PhD, MD)","Другое"] },
-  eduField: { options: ["Технические науки","Естественные науки","Социальные науки","Гуманитарные науки","Экономика и бизнес","Искусство и дизайн","Медицина","Военное дело","Другое"] },
-  country: {
-    groups: {
-      "СНГ": ["Россия","Армения","Казахстан","Беларусь","Украина","Узбекистан","Азербайджан","Молдова","Кыргызстан","Таджикистан","Туркменистан"],
-      "Европа (не ЕС)": ["Грузия","Швейцария","Великобритания","Норвегия","Исландия","Лихтенштейн","Сербия","Черногория"],
-      "Европейский союз": ["Австрия","Бельгия","Болгария","Венгрия","Германия","Греция","Дания","Ирландия","Испания","Италия","Кипр","Латвия","Литва","Люксембург","Мальта","Нидерланды","Польша","Португалия","Румыния","Словакия","Словения","Финляндия","Франция","Хорватия","Чехия","Швеция","Эстония"],
-      "Другие регионы": ["Аргентина","Бахрейн","Бразилия","Израиль","Канада","Китай","Мексика","ОАЭ","США","Турция"],
+// ── АНКЕТА — подготовлено под будущую мультиязычность (находка №14 плана) ────
+// Заполнен только 'ru'. 'en'/'hy'/'fr' — намеренно пустые заготовки: работа
+// над мультиязычностью системы ведётся в отдельном чате («МНОГО Лингва»),
+// не дублируем и не придумываем перевод здесь. populateRegForm(lang) сам
+// откатывается на 'ru', если для запрошенного языка перевода ещё нет —
+// ничего не сломается, просто покажется русский текст, пока не заполнят.
+const REG_FORM_BY_LANG = {
+  ru: {
+    gender: { options: ["Мужской","Женский","Предпочитаю не указывать"] },
+    age: { options: ["До 25 лет","25–34","35–44","45–54","55–64","65 и старше","Предпочитаю не указывать"] },
+    marital: { options: ["Не состою в отношениях","В отношениях","В браке","Разведён(а)","Вдовец / вдова","Предпочитаю не отвечать"] },
+    children: { options: ["Нет","Да"] },
+    education: { options: ["Среднее","Среднее специальное","Высшее (бакалавр)","Высшее (магистр)","Учёная степень (PhD, MD)","Другое"] },
+    eduField: { options: ["Технические науки","Естественные науки","Социальные науки","Гуманитарные науки","Экономика и бизнес","Искусство и дизайн","Медицина","Военное дело","Другое"] },
+    country: {
+      groups: {
+        "СНГ": ["Россия","Армения","Казахстан","Беларусь","Украина","Узбекистан","Азербайджан","Молдова","Кыргызстан","Таджикистан","Туркменистан"],
+        "Европа (не ЕС)": ["Грузия","Швейцария","Великобритания","Норвегия","Исландия","Лихтенштейн","Сербия","Черногория"],
+        "Европейский союз": ["Австрия","Бельгия","Болгария","Венгрия","Германия","Греция","Дания","Ирландия","Испания","Италия","Кипр","Латвия","Литва","Люксембург","Мальта","Нидерланды","Польша","Португалия","Румыния","Словакия","Словения","Финляндия","Франция","Хорватия","Чехия","Швеция","Эстония"],
+        "Другие регионы": ["Аргентина","Бахрейн","Бразилия","Израиль","Канада","Китай","Мексика","ОАЭ","США","Турция"],
+      },
+      other: "Другая",
     },
-    other: "Другая",
+    field: { options: ["Менеджмент / Управление","Образование / Наука","Консультирование / Коучинг","Предпринимательство","HR / Организационное развитие","Медицина / Здравоохранение","Право / Финансы","Творческие профессии","Другое"] },
+    langNative: { options: ["Русский","Французский","Грузинский","Казахский","Английский","Армянский","Арабский","Испанский","Немецкий","Китайский","Другой"] },
+    langAdd: { options: ["Русский","Французский","Грузинский","Казахский","Английский","Армянский","Арабский","Испанский","Немецкий","Китайский","Другой","Нет"] },
+    labels: {
+      gender: "Пол", age: "Возраст", marital: "Семейное положение", children: "Есть ли у вас дети?",
+      education: "Уровень образования", eduField: "Направление образования", country: "Страна",
+      field: "Сфера деятельности", langNative: "Родной язык", langAdd: "Дополнительный язык",
+      placeholder: "Выберите...",
+    },
   },
-  field: { options: ["Менеджмент / Управление","Образование / Наука","Консультирование / Коучинг","Предпринимательство","HR / Организационное развитие","Медицина / Здравоохранение","Право / Финансы","Творческие профессии","Другое"] },
-  langNative: { options: ["Русский","Французский","Грузинский","Казахский","Английский","Армянский","Арабский","Испанский","Немецкий","Китайский","Другой"] },
-  langAdd: { options: ["Русский","Французский","Грузинский","Казахский","Английский","Армянский","Арабский","Испанский","Немецкий","Китайский","Другой","Нет"] },
+  // TODO(МНОГО Лингва): заполнить, когда будет готов перевод. Пока не
+  // заполнено — populateRegForm() автоматически покажет русский текст.
+  en: null,
+  hy: null,
+  fr: null,
 };
 
-function populateSelect(selEl, cfg) {
+function populateSelect(selEl, cfg, placeholder) {
   selEl.innerHTML = '';
   const ph = document.createElement('option');
-  ph.value = ''; ph.textContent = 'Выберите...';
+  ph.value = ''; ph.textContent = placeholder || 'Выберите...';
   selEl.appendChild(ph);
   if (cfg.groups) {
     Object.entries(cfg.groups).forEach(([groupLabel, opts]) => {
@@ -317,17 +336,30 @@ function populateSelect(selEl, cfg) {
   }
 }
 
-function populateRegForm() {
-  populateSelect(document.getElementById('r-gender'), REG_FORM.gender);
-  populateSelect(document.getElementById('r-age'), REG_FORM.age);
-  populateSelect(document.getElementById('r-marital'), REG_FORM.marital);
-  populateSelect(document.getElementById('r-children'), REG_FORM.children);
-  populateSelect(document.getElementById('r-education'), REG_FORM.education);
-  populateSelect(document.getElementById('r-edu-field'), REG_FORM.eduField);
-  populateSelect(document.getElementById('r-country'), REG_FORM.country);
-  populateSelect(document.getElementById('r-field'), REG_FORM.field);
-  populateSelect(document.getElementById('r-lang-native'), REG_FORM.langNative);
-  populateSelect(document.getElementById('r-lang-add'), REG_FORM.langAdd);
+function populateRegForm(lang) {
+  const form = REG_FORM_BY_LANG[lang] || REG_FORM_BY_LANG.ru;
+  const L = form.labels;
+  document.getElementById('lbl-gender').textContent = L.gender;
+  document.getElementById('lbl-age').textContent = L.age;
+  document.getElementById('lbl-marital').textContent = L.marital;
+  document.getElementById('lbl-children').textContent = L.children;
+  document.getElementById('lbl-education').textContent = L.education;
+  document.getElementById('lbl-eduField').textContent = L.eduField;
+  document.getElementById('lbl-country').textContent = L.country;
+  document.getElementById('lbl-field').textContent = L.field;
+  document.getElementById('lbl-langNative').textContent = L.langNative;
+  document.getElementById('lbl-langAdd').textContent = L.langAdd;
+
+  populateSelect(document.getElementById('r-gender'), form.gender, L.placeholder);
+  populateSelect(document.getElementById('r-age'), form.age, L.placeholder);
+  populateSelect(document.getElementById('r-marital'), form.marital, L.placeholder);
+  populateSelect(document.getElementById('r-children'), form.children, L.placeholder);
+  populateSelect(document.getElementById('r-education'), form.education, L.placeholder);
+  populateSelect(document.getElementById('r-edu-field'), form.eduField, L.placeholder);
+  populateSelect(document.getElementById('r-country'), form.country, L.placeholder);
+  populateSelect(document.getElementById('r-field'), form.field, L.placeholder);
+  populateSelect(document.getElementById('r-lang-native'), form.langNative, L.placeholder);
+  populateSelect(document.getElementById('r-lang-add'), form.langAdd, L.placeholder);
 }
 
 async function startForm() {
