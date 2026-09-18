@@ -391,7 +391,7 @@ p{color:var(--ink-soft);font-size:15px}
     <p style="margin-bottom:8px" id="thanks-sub1">Спасибо за участие!</p>
     <p id="thanks-sub2">Ваш краткий результат — ниже.</p>
     <div id="thanks-report" style="text-align:left;margin:8px auto 24px"></div>
-    <button class="btn btn-primary btn-lg" style="margin-bottom:20px" onclick="downloadReportPdf()">Скачать PDF-отчёт</button>
+    <button class="btn btn-primary btn-lg" id="btn-download-pdf" style="margin-bottom:20px" onclick="downloadReportPdf()">Скачать PDF-отчёт</button>
     <div class="thank-box">
       <h3 id="thanks-next-title">Что дальше?</h3>
       <p id="thanks-next-text">Более подробное объяснение результатов и персональные рекомендации
@@ -467,6 +467,24 @@ const CONTENT = {
       error_info: "Ваши ответы сохранены в браузере. Нажмите кнопку ниже чтобы попробовать ещё раз.",
       btn_retry: "Попробовать ещё раз",
       error_retry_suffix: " Ваши ответы сохранены. Попробуйте отправить ещё раз.",
+      error_server: "Ошибка сервера",
+      error_no_connection: "Нет соединения с сервером.",
+      error_start: "Ошибка: ",
+      opt_letters: ["А","Б","В","Г"],
+      btn_download_pdf: "Скачать PDF-отчёт",
+      pdf_unavailable: "PDF недоступен (не было соединения при отправке).",
+      report: {
+        pending:    "Результат обрабатывается. Обратитесь к вашему фасилитатору.",
+        thinking:   "Тип мышления",
+        maturity:   "Уровень зрелости",
+        overall:    "Общий балл",
+        comps:      "Компетенции",
+        awareness:  "Осознанность",
+        authorship: "Авторство",
+        resonance:  "Резонанс",
+        reframing:  "Рефрейминг",
+        embodiment: "Воплощение",
+      },
     },
     form: {
       gender: { label: "Пол", options: ["Мужской","Женский","Предпочитаю не указывать"] },
@@ -558,7 +576,7 @@ const CONTENT = {
       lbl_name: "Name", lbl_email: "Email",
       name_placeholder: "Your name", name_err: "Please enter your name",
       email_placeholder: "you@example.com", email_err: "Please enter a valid email address",
-      consent_text: "I consent to the processing of my answers and the data I provide for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. Data is processed by our service providers, including outside the EU, with appropriate safeguards; see the Privacy Policy. I can withdraw consent and request deletion.",
+      consent_text: "I consent to the processing of my answers and the data I provide for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. See the Privacy Policy for details. I know that I can withdraw my consent and request deletion.",
       consent_err: "Consent is required to continue",
       btn_start_test: "Start the test →",
       b1_label: "Block 1 · Thinking Style",
@@ -584,6 +602,24 @@ const CONTENT = {
       error_info: "Your answers have been saved in your browser. Click the button below to try again.",
       btn_retry: "Try again",
       error_retry_suffix: " Your answers have been saved. Please try sending them again.",
+      error_server: "Server error",
+      error_no_connection: "No connection to the server.",
+      error_start: "Error: ",
+      opt_letters: ["A","B","C","D"],
+      btn_download_pdf: "Download PDF report",
+      pdf_unavailable: "PDF is unavailable (there was no connection when your answers were sent).",
+      report: {
+        pending:    "Your result is being processed. Please contact your facilitator.",
+        thinking:   "Thinking type",
+        maturity:   "Maturity level",
+        overall:    "Overall score",
+        comps:      "Competencies",
+        awareness:  "Awareness",
+        authorship: "Authorship",
+        resonance:  "Resonance",
+        reframing:  "Reframing",
+        embodiment: "Embodiment",
+      },
     },
     form: {
       gender: { label: "Gender", options: ["Male","Female","Prefer not to say"] },
@@ -788,6 +824,7 @@ function applyLanguage(lang) {
   $('thanks-title').textContent = ui.thanks_title;
   $('thanks-sub1').textContent = ui.thanks_sub1;
   $('thanks-sub2').textContent = ui.thanks_sub2;
+  $('btn-download-pdf').textContent = ui.btn_download_pdf;
   $('thanks-next-title').textContent = ui.thanks_next_title;
   $('thanks-next-text').textContent = ui.thanks_next_text;
   $('error-title').textContent = ui.error_title;
@@ -826,14 +863,14 @@ async function checkCode() {
   errEl.textContent = '';
 
   if (raw.length < 4) {
-    errEl.textContent = 'Saisissez votre code d&#39;accès.';
+    errEl.textContent = "Saisissez votre code d'accès.";
     errEl.classList.add('on');
     return;
   }
 
   // Блокируем повторный вызов
   const btn = document.querySelector('#screen-code .btn-primary');
-  if (btn) { btn.disabled = true; btn.textContent = 'Проверяем...'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Vérification...'; }
 
   try {
     const r = await fetch(API + '/test/verify-code', {
@@ -845,11 +882,11 @@ async function checkCode() {
 
     if (!d.valid) {
       const msgs = {
-        not_found:    'Код не найден. Проверьте правильность ввода.',
-        already_used: 'Этот код уже был использован.',
-        expired:      'Срок действия кода истёк. Обратитесь к организатору.',
+        not_found:    'Code introuvable. Vérifiez la saisie.',
+        already_used: 'Ce code a déjà été utilisé.',
+        expired:      "Ce code a expiré. Contactez l'organisateur.",
       };
-      errEl.textContent = msgs[d.reason] || 'Неверный код. Попробуйте ещё раз.';
+      errEl.textContent = msgs[d.reason] || 'Code incorrect. Réessayez.';
       errEl.classList.add('on');
       if (btn) { btn.disabled = false; btn.textContent = 'Commencer →'; }
       return;
@@ -873,7 +910,7 @@ async function checkCode() {
     go('screen-reg');
 
   } catch(e) {
-    errEl.textContent = 'Ошибка соединения с сервером. Проверьте интернет и попробуйте ещё раз.';
+    errEl.textContent = 'Erreur de connexion au serveur. Vérifiez votre connexion et réessayez.';
     errEl.classList.add('on');
     if (btn) { btn.disabled = false; btn.textContent = 'Commencer →'; }
   }
@@ -932,7 +969,7 @@ async function beginTest(demo) {
       })
     });
     const d = await r.json();
-    if (d.error) { alert('Ошибка: ' + d.error); return; }
+    if (d.error) { alert(UI().error_start + d.error); return; }
     S.sessionId = d.sessionId;
   } catch(e) {
     S.sessionId = 'local-' + Date.now();
@@ -958,7 +995,7 @@ function renderB1() {
   // Латинский квадрат
   const order = S.latinOrders[S.i1 % 4];
   const opts  = order.map(i => q.opts[i]);
-  const letters = ['А','Б','В','Г'];
+  const letters = UI().opt_letters;
 
   const container = $('b1-opts');
   container.innerHTML = '';
@@ -1092,7 +1129,8 @@ async function submitTest() {
 
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
-      showError(d.error || 'Ошибка сервера (' + r.status + ')');
+      const serverMsg = (S.language === 'ru' && d.error) ? d.error : null;
+      showError(serverMsg || (UI().error_server + ' (' + r.status + ')'));
       return;
     }
 
@@ -1105,7 +1143,7 @@ async function submitTest() {
     go('screen-thanks');
 
   } catch(e) {
-    showError('Нет соединения с сервером.');
+    showError(UI().error_no_connection);
   }
 }
 
@@ -1113,9 +1151,7 @@ async function submitTest() {
 // Экспресс-PDF участнику (Вариант B, без письма) — скачивание с сервера по sessionId.
 function downloadReportPdf() {
   if (!S.sessionId || String(S.sessionId).indexOf('local-') === 0) {
-    alert(S.language === 'en'
-      ? 'PDF is unavailable (no connection during submission).'
-      : 'PDF недоступен (не было соединения при отправке).');
+    alert(UI().pdf_unavailable);
     return;
   }
   window.open(API + '/test/report-pdf/' + encodeURIComponent(S.sessionId), '_blank');
@@ -1124,24 +1160,14 @@ function downloadReportPdf() {
 function renderShortReport(report) {
   const el = $('thanks-report');
   if (!el) return;
-  const en = (typeof S !== 'undefined' && S.language === 'en');
+  // Подписи берутся из CONTENT[lang].ui.report — как и весь остальной
+  // текст экрана; раньше они были захардкожены парами ru/en прямо здесь.
+  const t = UI().report;
   if (!report) {
-    el.innerHTML = '<p>' + (en ? 'Result is being processed. Please contact your facilitator.'
-                                : 'Результат обрабатывается. Обратитесь к вашему фасилитатору.') + '</p>';
+    el.innerHTML = '<p>' + t.pending + '</p>';
     return;
   }
   const c = report.competencies || {};
-  const t = {
-    thinking: en ? 'Thinking type' : 'Тип мышления',
-    maturity: en ? 'Maturity level' : 'Уровень зрелости',
-    overall:  en ? 'Overall score' : 'Общий балл',
-    comps:    en ? 'Competencies' : 'Компетенции',
-    aware: en ? 'Awareness' : 'Осознанность',
-    author: en ? 'Authorship' : 'Авторство',
-    reson: en ? 'Resonance' : 'Резонанс',
-    refr: en ? 'Reframing' : 'Рефрейминг',
-    embod: en ? 'Embodiment' : 'Воплощение',
-  };
   const row = (label, o) => (o && typeof o.score === 'number')
     ? '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>' + label + '</span><b>' + o.score + '</b></div>'
     : '';
@@ -1152,8 +1178,8 @@ function renderShortReport(report) {
       (typeof report.overallScore === 'number' ? '<p><b>' + t.overall + ':</b> ' + report.overallScore + '</p>' : '') +
       '<hr style="border:none;border-top:1px solid #eee;margin:10px 0">' +
       '<p style="font-weight:700;margin-bottom:6px">' + t.comps + '</p>' +
-      row(t.aware, c.awareness) + row(t.author, c.authorship) + row(t.reson, c.resonance) +
-      row(t.refr, c.reframing) + row(t.embod, c.embodiment) +
+      row(t.awareness, c.awareness) + row(t.authorship, c.authorship) + row(t.resonance, c.resonance) +
+      row(t.reframing, c.reframing) + row(t.embodiment, c.embodiment) +
     '</div>';
 }
 

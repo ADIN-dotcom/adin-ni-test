@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Нарративный статус · ADIN</title>
+<title id="page-title">Нарративный статус · ADIN</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -100,7 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <div class="header">
   <div>
     <div class="logo">ADIN</div>
-    <div class="logo-sub">Нарратив будущего</div>
+    <div class="logo-sub" id="logo-sub">Нарратив будущего</div>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
@@ -111,8 +111,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <!-- ВХОД ПО КОДУ -->
 <div class="screen active" id="screen-login">
   <div class="login-wrap">
-    <h1>Нарративный статус</h1>
-    <p>Введите код доступа из письма-приглашения</p>
+    <h1 id="login-title">Нарративный статус</h1>
+    <p id="login-sub">Введите код доступа из письма-приглашения</p>
     <input class="code-input" id="code-input" type="text"
       placeholder="ADIN-XXXX" maxlength="9"
       oninput="this.value=this.value.toUpperCase()"
@@ -126,14 +126,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <div class="screen" id="screen-intro">
   <div class="intro-wrap">
     <h1 id="intro-title">Нарративный статус</h1>
-    <p>13 вопросов о вашем опыте в компании — прошлом, настоящем и будущем.<br>
+    <p id="intro-text">13 вопросов о вашем опыте в компании — прошлом, настоящем и будущем.<br>
     Нет правильных или неправильных ответов. Пишите первое что приходит.</p>
     <div class="block-badges">
-      <span class="badge badge-1">① Прошлое · 4 вопроса</span>
-      <span class="badge badge-2">② Настоящее · 6 вопросов</span>
-      <span class="badge badge-3">③ Будущее · 3 вопроса</span>
+      <span class="badge badge-1" id="badge-1">① Прошлое · 4 вопроса</span>
+      <span class="badge badge-2" id="badge-2">② Настоящее · 6 вопросов</span>
+      <span class="badge badge-3" id="badge-3">③ Будущее · 3 вопроса</span>
     </div>
-    <p style="font-size:14px;color:var(--ink-faint)">Ориентировочное время — 10–15 минут</p>
+    <p style="font-size:14px;color:var(--ink-faint)" id="intro-time">Ориентировочное время — 10–15 минут</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin:20px 0 8px">
       <div class="field"><label id="lbl-gender" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Пол</label><select id="r-gender" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
       <div class="field"><label id="lbl-age" style="font-size:12px;color:var(--ink-faint);display:block;margin-bottom:4px">Возраст</label><select id="r-age" style="width:100%;padding:10px;border:1.5px solid var(--cream-d);border-radius:8px;font-family:inherit;font-size:14px"></select></div>
@@ -148,10 +148,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     </div>
     <label style="display:flex;gap:10px;align-items:flex-start;text-align:left;margin:16px 0;font-size:13px;color:var(--ink-soft)">
       <input type="checkbox" id="nsr-consent" style="margin-top:3px;width:17px;height:17px;flex-shrink:0">
-      <span>Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
+      <span id="consent-text">Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
     </label>
     <div id="nsr-consent-err" style="display:none;color:#c0392b;font-size:13px;margin-bottom:8px">Необходимо согласие для продолжения</div>
-    <button class="btn-start" onclick="startForm()">Начать</button>
+    <button class="btn-start" id="btn-start" onclick="startForm()">Начать</button>
   </div>
 </div>
 
@@ -179,8 +179,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <div class="screen" id="screen-loading">
   <div class="finish-wrap">
     <div class="finish-icon" style="animation: ns-spin 1.6s linear infinite">🔮</div>
-    <h2>Анализируем ваши ответы…</h2>
-    <p>Это может занять до минуты — мы собираем ваш нарративный статус.<br><br>
+    <h2 id="loading-title">Анализируем ваши ответы…</h2>
+    <p id="loading-text">Это может занять до минуты — мы собираем ваш нарративный статус.<br><br>
     Пожалуйста, не закрывайте страницу и не нажимайте назад.</p>
   </div>
 </div>
@@ -188,8 +188,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <div class="screen" id="screen-finish">
   <div class="finish-wrap">
     <div class="finish-icon">✅</div>
-    <h2>Спасибо!</h2>
-    <p>Ваши ответы получены и переданы фасилитатору программы.<br><br>
+    <h2 id="finish-title">Спасибо!</h2>
+    <p id="finish-text">Ваши ответы получены и переданы фасилитатору программы.<br><br>
     Результаты анализа будут использованы для подготовки сценария программы «Нарратив будущего».</p>
   </div>
 </div>
@@ -197,7 +197,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <div class="screen" id="screen-error">
   <div class="finish-wrap">
     <div class="finish-icon">⚠️</div>
-    <h2>Что-то пошло не так</h2>
+    <h2 id="error-title">Что-то пошло не так</h2>
     <p id="error-detail">Пожалуйста, свяжитесь с организатором программы.</p>
   </div>
 </div>
@@ -205,7 +205,84 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <script>
 const API = 'https://adin-ni-backend-production.up.railway.app/api';
 
-const QUESTIONS = [
+// ── ЯЗЫК ─────────────────────────────────────────────────────────────────────
+// Язык фиксируется при выдаче кода (дашборд) и приходит из /test/verify-code —
+// участник его не выбирает. Тот же принцип, что в НИ-тесте (index.html):
+// CONTENT[lang] + applyLanguage(lang), тихий откат на 'ru'.
+let LANG = 'ru';
+const UI = () => CONTENT[LANG].ui;
+
+const CONTENT = {
+  ru: {
+    ui: {
+      page_title: 'Нарративный статус · ADIN',
+      logo_sub: 'Нарратив будущего',
+      login_title: 'Нарративный статус',
+      login_sub: 'Введите код доступа из письма-приглашения',
+      login_error: 'Код не найден. Проверьте письмо и попробуйте снова.',
+      login_conn_error: 'Ошибка соединения. Попробуйте позже.',
+      btn_enter: 'Войти →',
+      btn_checking: 'Проверяем…',
+      intro_title: 'Нарративный статус',
+      intro_hello: 'Здравствуйте, {name}!',
+      intro_text: '13 вопросов о вашем опыте в компании — прошлом, настоящем и будущем.<br>Нет правильных или неправильных ответов. Пишите первое что приходит.',
+      badge_1: '① Прошлое · 4 вопроса', badge_2: '② Настоящее · 6 вопросов', badge_3: '③ Будущее · 3 вопроса',
+      intro_time: 'Ориентировочное время — 10–15 минут',
+      consent_text: "Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.",
+      consent_err: 'Необходимо согласие для продолжения',
+      btn_start: 'Начать',
+      q_num: 'Вопрос {n} из 13',
+      answer_placeholder: 'Ваш ответ...',
+      error_min: 'Пожалуйста, напишите хотя бы несколько слов',
+      btn_back: '← Назад', btn_next: 'Далее →', btn_submit: 'Отправить ✓', btn_sending: 'Отправляем…',
+      chars: ' симв.',
+      loading_title: 'Анализируем ваши ответы…',
+      loading_text: 'Это может занять до минуты — мы собираем ваш нарративный статус.<br><br>Пожалуйста, не закрывайте страницу и не нажимайте назад.',
+      finish_title: 'Спасибо!',
+      finish_text: 'Ваши ответы получены и переданы фасилитатору программы.<br><br>Результаты анализа будут использованы для подготовки сценария программы «Нарратив будущего».',
+      error_title: 'Что-то пошло не так',
+      error_detail: 'Пожалуйста, свяжитесь с организатором программы.',
+      server_error: 'Ошибка сервера',
+    },
+  },
+  en: {
+    ui: {
+      page_title: 'Narrative Status · ADIN',
+      logo_sub: 'Narrative of the Future',
+      login_title: 'Narrative Status',
+      login_sub: 'Enter the access code from your invitation email',
+      login_error: 'Code not found. Check the email and try again.',
+      login_conn_error: 'Connection error. Please try again later.',
+      btn_enter: 'Enter →',
+      btn_checking: 'Checking…',
+      intro_title: 'Narrative Status',
+      intro_hello: 'Hello, {name}!',
+      intro_text: '13 questions about your experience in the company — past, present and future.<br>There are no right or wrong answers. Write the first thing that comes to mind.',
+      badge_1: '① Past · 4 questions', badge_2: '② Present · 6 questions', badge_3: '③ Future · 3 questions',
+      intro_time: 'Approximate time — 10–15 minutes',
+      consent_text: "I consent to the processing of my answers for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. See the Privacy Policy for details. I know that I can withdraw my consent and request deletion.",
+      consent_err: 'Consent is required to continue',
+      btn_start: 'Start',
+      q_num: 'Question {n} of 13',
+      answer_placeholder: 'Your answer...',
+      error_min: 'Please write at least a few words',
+      btn_back: '← Back', btn_next: 'Next →', btn_submit: 'Submit ✓', btn_sending: 'Sending…',
+      chars: ' chars',
+      loading_title: 'Analysing your answers…',
+      loading_text: 'This may take up to a minute — we are assembling your narrative status.<br><br>Please do not close the page or press back.',
+      finish_title: 'Thank you!',
+      finish_text: 'Your answers have been received and passed on to the programme facilitator.<br><br>The results of the analysis will be used to prepare the scenario of the “Narrative of the Future” programme.',
+      error_title: 'Something went wrong',
+      error_detail: 'Please contact the programme organiser.',
+      server_error: 'Server error',
+    },
+  },
+};
+
+// Тексты вопросов на каждом языке — дословно те же уходят в модель на
+// сервере (routes/narrative_status.js, QUESTIONS_BY_LANG): менять синхронно.
+const QUESTIONS_BY_LANG = {
+  ru: [
   {block:'① Прошлое',n:'01',text:'Вспомните момент в работе, когда всё шло именно так, как надо. Что тогда происходило?',hint:'Опишите ситуацию — что было, кто был рядом, что вы чувствовали.',short:false},
   {block:'① Прошлое',n:'02',text:'Что из того, что было раньше в вашей команде или компании, вы бы хотели вернуть?',hint:'Это может быть атмосфера, способ работы, конкретный человек или период.',short:false},
   {block:'① Прошлое',n:'03',text:'Если бы вы описали последние 2–3 года в компании одним словом — какое это слово?',hint:'Первое слово которое приходит.',short:true},
@@ -219,7 +296,47 @@ const QUESTIONS = [
   {block:'③ Будущее',n:'11',text:'Представьте: прошло три года. Что изменилось? Опишите один конкретный момент из той жизни.',hint:'Где вы? Что происходит? Кто рядом? Что вы чувствуете?',short:false},
   {block:'③ Будущее',n:'12',text:'Что должно произойти, чтобы вы почувствовали: «вот теперь всё идёт как надо»?',hint:'Конкретное событие, изменение, результат.',short:false},
   {block:'③ Будущее',n:'13',text:'Закончите предложение: «Мы как команда способны на…»',hint:'',short:false,prefix:'Мы как команда способны на '},
-];
+  ],
+  en: [
+    {block:'① Past',n:'01',text:'Recall a moment at work when everything was going exactly the way it should. What was happening then?',hint:'Describe the situation — what was going on, who was around you, what you felt.',short:false},
+    {block:'① Past',n:'02',text:'What from the way things used to be in your team or company would you like to bring back?',hint:'It could be the atmosphere, a way of working, a particular person or period.',short:false},
+    {block:'① Past',n:'03',text:'If you described the last 2–3 years in the company in one word — what would that word be?',hint:'The first word that comes to mind.',short:true},
+    {block:'① Past',n:'04',text:'If you described the last 2–3 years of your own life in one word — what would that word be?',hint:'Not about the company — about you personally.',short:true},
+    {block:'② Present',n:'05',text:'What is happening in the company right now — if you explained it as a story with heroes and a plot?',hint:'Who are the heroes? Who are the villains? Is there a plot? How might it all end?',short:false},
+    {block:'② Present',n:'06',text:'What takes the most energy out of you at work right now?',hint:'What is hardest — people, tasks, situations, the atmosphere?',short:false},
+    {block:'② Present',n:'07',text:'If the company were a character in a book — who would it be right now? What is happening to it?',hint:'It can be any character — from a book, a film, a fairy tale.',short:false},
+    {block:'② Present',n:'08',text:'Complete the sentence: “We would move faster if it weren’t for…”',hint:'',short:false,prefix:'We would move faster if it weren’t for '},
+    {block:'② Present',n:'09',text:'Complete the sentence: “In this situation, my role is…”',hint:'',short:false,prefix:'In this situation, my role is '},
+    {block:'② Present',n:'10',text:'What does the word “change” mean to you — the first association, one or two words?',hint:'Don’t think — the first thing that comes.',short:true},
+    {block:'③ Future',n:'11',text:'Imagine three years have passed. What has changed? Describe one specific moment from that life.',hint:'Where are you? What is happening? Who is around you? What do you feel?',short:false},
+    {block:'③ Future',n:'12',text:'What would have to happen for you to feel: “now everything is going the way it should”?',hint:'A specific event, change, result.',short:false},
+    {block:'③ Future',n:'13',text:'Complete the sentence: “As a team, we are capable of…”',hint:'',short:false,prefix:'As a team, we are capable of '},
+  ],
+};
+let QUESTIONS = QUESTIONS_BY_LANG.ru;
+
+function applyLanguage(lang) {
+  LANG = CONTENT[lang] ? lang : 'ru';
+  QUESTIONS = QUESTIONS_BY_LANG[LANG] || QUESTIONS_BY_LANG.ru;
+  document.documentElement.lang = LANG;
+  const t = UI();
+  document.title = t.page_title;
+  const set = (id, val, html) => { const el = document.getElementById(id); if (el) { if (html) el.innerHTML = val; else el.textContent = val; } };
+  set('logo-sub', t.logo_sub);
+  set('login-title', t.login_title); set('login-sub', t.login_sub);
+  set('login-error', t.login_error); set('btn-enter', t.btn_enter);
+  set('intro-text', t.intro_text, true);
+  set('badge-1', t.badge_1); set('badge-2', t.badge_2); set('badge-3', t.badge_3);
+  set('intro-time', t.intro_time);
+  set('consent-text', t.consent_text); set('nsr-consent-err', t.consent_err);
+  set('btn-start', t.btn_start);
+  document.getElementById('q-answer').placeholder = t.answer_placeholder;
+  set('error-msg', t.error_min);
+  set('btn-back', t.btn_back);
+  set('loading-title', t.loading_title); set('loading-text', t.loading_text, true);
+  set('finish-title', t.finish_title); set('finish-text', t.finish_text, true);
+  set('error-title', t.error_title); set('error-detail', t.error_detail);
+}
 
 let current = 0;
 const answers = {};
@@ -234,7 +351,7 @@ async function verifyCode() {
     return;
   }
   const btn = document.getElementById('btn-enter');
-  btn.disabled = true; btn.textContent = 'Проверяем…';
+  btn.disabled = true; btn.textContent = UI().btn_checking;
   document.getElementById('login-error').style.display = 'none';
 
   try {
@@ -248,9 +365,11 @@ async function verifyCode() {
       accessCode = code;
       participantId = data.participant_id || null;
       groupId = data.groupId || null;
+      // Язык — из записи кода; форма, вопросы и анкета переключаются целиком.
+      applyLanguage(data.language || 'ru');
       const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
       document.getElementById('intro-title').textContent =
-        name ? 'Здравствуйте, ' + name + '!' : 'Нарративный статус';
+        name ? UI().intro_hello.replace('{name}', name) : UI().intro_title;
       // Единое согласие: если уже дано под этим кодом — предотметим галочку.
       try {
         const ir = await fetch(API + '/test/intake/' + encodeURIComponent(code));
@@ -260,16 +379,17 @@ async function verifyCode() {
           if (cb) cb.checked = true;
         }
       } catch(e) {}
-      populateRegForm('ru'); // TODO(МНОГО Лингва): передавать сюда data.language, когда формы научатся его читать
+      populateRegForm(LANG);
       showScreen('screen-intro');
     } else {
+      document.getElementById('login-error').textContent = UI().login_error;
       document.getElementById('login-error').style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Войти →';
+      btn.disabled = false; btn.textContent = UI().btn_enter;
     }
   } catch(e) {
-    document.getElementById('login-error').textContent = 'Ошибка соединения. Попробуйте позже.';
+    document.getElementById('login-error').textContent = UI().login_conn_error;
     document.getElementById('login-error').style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Войти →';
+    btn.disabled = false; btn.textContent = UI().btn_enter;
   }
 }
 
@@ -278,12 +398,9 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-// ── АНКЕТА — подготовлено под будущую мультиязычность (находка №14 плана) ────
-// Заполнен только 'ru'. 'en'/'hy'/'fr' — намеренно пустые заготовки: работа
-// над мультиязычностью системы ведётся в отдельном чате («МНОГО Лингва»),
-// не дублируем и не придумываем перевод здесь. populateRegForm(lang) сам
-// откатывается на 'ru', если для запрошенного языка перевода ещё нет —
-// ничего не сломается, просто покажется русский текст, пока не заполнят.
+// ── АНКЕТА — по языку кода (ru/en). populateRegForm(lang) сам откатывается
+// на 'ru', если для запрошенного языка перевода нет (hy/fr) — ничего не
+// сломается, просто покажется русский текст.
 const REG_FORM_BY_LANG = {
   ru: {
     gender: { options: ["Мужской","Женский","Предпочитаю не указывать"] },
@@ -311,9 +428,35 @@ const REG_FORM_BY_LANG = {
       placeholder: "Выберите...",
     },
   },
-  // TODO(МНОГО Лингва): заполнить, когда будет готов перевод. Пока не
-  // заполнено — populateRegForm() автоматически покажет русский текст.
-  en: null,
+  // Английские варианты — те же, что в анкете НИ-теста (index.html,
+  // CONTENT.en.form), чтобы демография разных инструментов сравнивалась.
+  en: {
+    gender: { options: ["Male","Female","Prefer not to say"] },
+    age: { options: ["Under 25","25–34","35–44","45–54","55–64","65 or older","Prefer not to say"] },
+    marital: { options: ["Not in a relationship","In a relationship","Married","Divorced","Widowed","Prefer not to answer"] },
+    children: { options: ["No","Yes"] },
+    education: { options: ["Secondary","Vocational","Bachelor's degree","Master's degree","Doctoral degree (PhD, MD)","Other"] },
+    eduField: { options: ["Engineering & Technology","Natural Sciences","Social Sciences","Humanities","Economics & Business","Art & Design","Medicine","Military","Other"] },
+    country: {
+      groups: {
+        "CIS": ["Russia","Armenia","Kazakhstan","Belarus","Ukraine","Uzbekistan","Azerbaijan","Moldova","Kyrgyzstan","Tajikistan","Turkmenistan"],
+        "Europe (non-EU)": ["Georgia","Switzerland","United Kingdom","Norway","Iceland","Liechtenstein","Serbia","Montenegro"],
+        "European Union": ["Austria","Belgium","Bulgaria","Hungary","Germany","Greece","Denmark","Ireland","Spain","Italy","Cyprus","Latvia","Lithuania","Luxembourg","Malta","Netherlands","Poland","Portugal","Romania","Slovakia","Slovenia","Finland","France","Croatia","Czechia","Sweden","Estonia"],
+        "Other regions": ["Argentina","Bahrain","Brazil","Israel","Canada","China","Mexico","UAE","USA","Turkey"],
+      },
+      other: "Other",
+    },
+    field: { options: ["Management","Education / Science","Consulting / Coaching","Entrepreneurship","HR / Organizational Development","Medicine / Healthcare","Law / Finance","Creative professions","Other"] },
+    langNative: { options: ["Russian","French","Georgian","Kazakh","English","Armenian","Arabic","Spanish","German","Chinese","Other"] },
+    langAdd: { options: ["Russian","French","Georgian","Kazakh","English","Armenian","Arabic","Spanish","German","Chinese","Other","None"] },
+    labels: {
+      gender: "Gender", age: "Age", marital: "Marital status", children: "Do you have children?",
+      education: "Education level", eduField: "Field of education", country: "Country",
+      field: "Field of activity", langNative: "Native language", langAdd: "Additional language",
+      placeholder: "Select...",
+    },
+  },
+  // hy/fr — заготовки: populateRegForm() откатится на русский.
   hy: null,
   fr: null,
 };
@@ -394,7 +537,7 @@ async function startForm() {
 function renderQuestion() {
   const q = QUESTIONS[current];
   document.getElementById('q-block').textContent = q.block;
-  document.getElementById('q-num').textContent = 'Вопрос ' + q.n + ' из 13';
+  document.getElementById('q-num').textContent = UI().q_num.replace('{n}', q.n);
   document.getElementById('q-text').textContent = q.text;
   const hint = document.getElementById('q-hint');
   hint.textContent = q.hint || '';
@@ -407,7 +550,7 @@ function renderQuestion() {
   ta.focus();
 
   document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
-  document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? 'Отправить ✓' : 'Далее →';
+  document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? UI().btn_submit : UI().btn_next;
   document.getElementById('error-msg').style.display = 'none';
   updateProgress();
   updateCharCount();
@@ -420,7 +563,7 @@ function updateCharCount() {
   const q = QUESTIONS[current];
   const prefix = q.prefix || '';
   const actual = val.startsWith(prefix) ? val.slice(prefix.length) : val;
-  document.getElementById('char-count').textContent = actual.length > 0 ? actual.length + ' симв.' : '';
+  document.getElementById('char-count').textContent = actual.length > 0 ? actual.length + UI().chars : '';
 }
 
 function updateProgress() {
@@ -444,7 +587,7 @@ function goNext() {
 
 async function submitForm() {
   const btn = document.getElementById('btn-next');
-  btn.disabled = true; btn.textContent = 'Отправляем…';
+  btn.disabled = true; btn.textContent = UI().btn_sending;
   showScreen('screen-loading');
   try {
     const body = {
@@ -452,6 +595,7 @@ async function submitForm() {
       code: accessCode,
       participant_id: participantId,
       group_id: groupId,
+      language: LANG, // подсказка; сервер всё равно определяет язык по коду
     };
     const r = await fetch(API + '/narrative-status/submit', {
       method: 'POST',
@@ -464,7 +608,7 @@ async function submitForm() {
       document.getElementById('progress-txt').textContent = '13 / 13';
       showScreen('screen-finish');
     } else {
-      throw new Error(data.error || 'Ошибка сервера');
+      throw new Error(data.error || UI().server_error);
     }
   } catch(err) {
     document.getElementById('error-detail').textContent = err.message;
