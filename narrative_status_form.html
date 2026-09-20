@@ -264,7 +264,7 @@ async function verifyCode() {
     const r = await fetch(API + '/test/verify-code', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({code}),
+      body: JSON.stringify({code, test_type: 'narrative_status'}),
     });
     const data = await r.json();
     if (data.valid) {
@@ -287,7 +287,13 @@ async function verifyCode() {
       populateRegForm('ru'); // TODO(МНОГО Лингва): передавать сюда data.language, когда формы научатся его читать
       showScreen('screen-intro');
     } else {
-      document.getElementById('login-error').style.display = 'block';
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = ({
+        already_used: 'Этот код уже использован — ответы по нему сданы.',
+        wrong_test:   'Этот код выдан для другого теста. Проверьте письмо.',
+        expired:      'Срок действия кода истёк. Обратитесь к организатору.',
+      })[data.reason] || 'Код не найден. Проверьте письмо и попробуйте снова.';
+      errEl.style.display = 'block';
       btn.disabled = false; btn.textContent = 'Войти →';
     }
   } catch(e) {

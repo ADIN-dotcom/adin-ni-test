@@ -839,7 +839,7 @@ async function checkCode() {
     const r = await fetch(API + '/test/verify-code', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({code: raw})
+      body: JSON.stringify({code: raw, test_type: 'ni_test'})
     });
     const d = await r.json();
 
@@ -847,6 +847,7 @@ async function checkCode() {
       const msgs = {
         not_found:    'Код не найден. Проверьте правильность ввода.',
         already_used: 'Этот код уже был использован.',
+        wrong_test:   'Этот код выдан для другого теста. Проверьте письмо.',
         expired:      'Срок действия кода истёк. Обратитесь к организатору.',
       };
       errEl.textContent = msgs[d.reason] || 'Неверный код. Попробуйте ещё раз.';
