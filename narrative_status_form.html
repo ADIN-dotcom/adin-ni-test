@@ -197,13 +197,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
 <div class="screen" id="screen-error">
   <div class="finish-wrap">
     <div class="finish-icon">⚠️</div>
-    <h2>Что-то пошло не так</h2>
+    <h2>Не удалось отправить ответы</h2>
     <p id="error-detail">Пожалуйста, свяжитесь с организатором программы.</p>
+    <p style="margin-top:14px">Ваши ответы сохранены на этом устройстве — ничего не потеряно.
+      Нажмите «Повторить отправку». Если не помогает — откройте эту же ссылку
+      в Safari или Chrome и введите свой код: ответы подставятся автоматически.</p>
+    <button class="btn-nav btn-next" style="margin-top:18px" onclick="submitForm()">Повторить отправку</button>
   </div>
 </div>
 
 <script>
-const API = '/api'; // тот же домен: Pages Function functions/api/[[path]].js проксирует на Railway (Railway и *.pages.dev недоступны из части сетей РФ)
+const API = '/api'; // тот же домен: nginx на VPS (или Pages Function) проксирует на Railway — Railway и CDN недоступны из части сетей РФ
 
 const QUESTIONS = [
   {block:'① Прошлое',n:'01',text:'Вспомните момент в работе, когда всё шло именно так, как надо. Что тогда происходило?',hint:'Опишите ситуацию — что было, кто был рядом, что вы чувствовали.',short:false},
@@ -227,6 +231,25 @@ let participantId = null;
 let groupId = null;
 let accessCode = null;
 
+// Черновик ответов на устройстве (по коду доступа). Если отправка сорвалась
+// (перехват запроса встроенным браузером, потеря сети) или вкладку закрыли,
+// повторный вход с тем же кодом подставляет ответы, а экран ошибки
+// предлагает «Повторить отправку». После успешной отправки черновик стирается.
+const DRAFT_PREFIX = 'adin_ns_draft_';
+function draftKey() { return accessCode ? DRAFT_PREFIX + accessCode : null; }
+function saveDraft() {
+  try { const k = draftKey(); if (k) localStorage.setItem(k, JSON.stringify({ answers, current })); } catch (e) {}
+}
+function loadDraft() {
+  try {
+    const k = draftKey(); const s = k && localStorage.getItem(k); if (!s) return;
+    const d = JSON.parse(s);
+    if (d && d.answers) Object.assign(answers, d.answers);
+    if (d && typeof d.current === 'number') current = Math.max(0, Math.min(d.current, QUESTIONS.length - 1));
+  } catch (e) {}
+}
+function clearDraft() { try { const k = draftKey(); if (k) localStorage.removeItem(k); } catch (e) {} }
+
 async function verifyCode() {
   const code = document.getElementById('code-input').value.trim().toUpperCase();
   if (!code || code.length < 6) {
@@ -246,6 +269,7 @@ async function verifyCode() {
     const data = await r.json();
     if (data.valid) {
       accessCode = code;
+      loadDraft();
       participantId = data.participant_id || null;
       groupId = data.groupId || null;
       const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
@@ -413,7 +437,13 @@ function renderQuestion() {
   updateCharCount();
 }
 
-function onInput() { updateCharCount(); document.getElementById('error-msg').style.display = 'none'; }
+function onInput() {
+  updateCharCount();
+  document.getElementById('error-msg').style.display = 'none';
+  // Черновик пишем на каждом вводе: даже незаконченный ответ не пропадёт.
+  answers[QUESTIONS[current].n] = document.getElementById('q-answer').value;
+  saveDraft();
+}
 
 function updateCharCount() {
   const val = document.getElementById('q-answer').value.trim();
@@ -438,8 +468,8 @@ function goNext() {
   const actual = val.startsWith(prefix) ? val.slice(prefix.length).trim() : val;
   if (actual.length < 2) { document.getElementById('error-msg').style.display = 'block'; return; }
   answers[q.n] = val;
-  if (current < QUESTIONS.length - 1) { current++; renderQuestion(); }
-  else submitForm();
+  if (current < QUESTIONS.length - 1) { current++; saveDraft(); renderQuestion(); }
+  else { saveDraft(); submitForm(); }
 }
 
 async function submitForm() {
@@ -460,6 +490,7 @@ async function submitForm() {
     });
     const data = await r.json();
     if (data.success) {
+      clearDraft();
       document.getElementById('progress').style.width = '100%';
       document.getElementById('progress-txt').textContent = '13 / 13';
       showScreen('screen-finish');
@@ -468,6 +499,7 @@ async function submitForm() {
     }
   } catch(err) {
     document.getElementById('error-detail').textContent = err.message;
+    btn.disabled = false; btn.textContent = 'Отправить ✓';
     showScreen('screen-error');
   }
 }
