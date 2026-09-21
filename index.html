@@ -842,6 +842,9 @@ async function checkCode() {
       body: JSON.stringify({code: raw, test_type: 'ni_test'})
     });
     const d = await r.json();
+    // Код перенесён на другой инстанс (например, RU-сервер): уходим туда
+    // с этим же кодом — письмо со старой ссылкой остаётся рабочим.
+    if (!d.valid && d.reason === 'moved' && d.redirect) { location.replace(d.redirect); return; }
 
     if (!d.valid) {
       const msgs = {
@@ -1176,6 +1179,21 @@ function showError(msg) {
   $('err-msg').textContent = msg + (UI().error_retry_suffix || ' Ваши ответы сохранены. Попробуйте отправить ещё раз.');
   go('screen-error');
 }
+
+// Код из адреса страницы (?code=ADIN-XXXX): так приходят участники, которых
+// перебросил другой инстанс, или по прямой ссылке. Подставляем в поле, убираем
+// из адресной строки и проверяем сами — остаётся нажать «Начать».
+(function () {
+  try {
+    const c = new URLSearchParams(location.search).get('code');
+    if (!c) return;
+    const inp = document.getElementById('inp-code');
+    if (!inp) return;
+    inp.value = c.trim().toUpperCase();
+    history.replaceState(null, '', location.pathname);
+    window.addEventListener('load', () => setTimeout(checkCode, 300));
+  } catch (e) { /* без кода в адресе — обычный вход */ }
+})();
 </script>
 </body>
 </html>
