@@ -1,0 +1,683 @@
+{
+  "Q1": [
+    {
+      "id": 1,
+      "text": "A serious problem has come up in your family or among people close to you. What do you do first?",
+      "opts": [
+        {
+          "t": "I try to understand exactly how this situation arose and what factors led to it",
+          "v": "A"
+        },
+        {
+          "t": "I think about what can be done right now to move forward",
+          "v": "B"
+        },
+        {
+          "t": "I say out loud what everyone is silent about — without that the conversation won't move",
+          "v": "C"
+        },
+        {
+          "t": "I want to understand what this situation means for each of the people close to me",
+          "v": "D"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "text": "You're offered something completely new to you. Your first reaction:",
+      "opts": [
+        {
+          "t": "I see several possibilities — and I want to get started",
+          "v": "B"
+        },
+        {
+          "t": "I immediately see where the promise and the reality diverge — and I want to clear that up",
+          "v": "C"
+        },
+        {
+          "t": "I want to understand why this matters and what it will change for people",
+          "v": "D"
+        },
+        {
+          "t": "I want to figure out how it works — its logic and structure",
+          "v": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "text": "A friend tells you about a difficult situation in their life. You:",
+      "opts": [
+        {
+          "t": "I notice they are steering around the main thing — and I name it gently",
+          "v": "C"
+        },
+        {
+          "t": "First, I want to understand what they're feeling and what this situation means to them",
+          "v": "D"
+        },
+        {
+          "t": "I try to understand the structure of the problem — what led to it and how it works",
+          "v": "A"
+        },
+        {
+          "t": "I think about what specifically can be done to change the situation",
+          "v": "B"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "text": "A meeting didn't go the way you planned. What do you think about afterward?",
+      "opts": [
+        {
+          "t": "I think about what was left unsaid and what this meeting meant for the people involved",
+          "v": "D"
+        },
+        {
+          "t": "I want to understand why it turned out that way — the logic behind what happened",
+          "v": "A"
+        },
+        {
+          "t": "I think about what needs to change next time to get a different result",
+          "v": "B"
+        },
+        {
+          "t": "I see specific mistakes that could have been avoided — and that will likely happen again",
+          "v": "C"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "text": "You read about a difficult situation that happened to people you don't know. What interests you most?",
+      "opts": [
+        {
+          "t": "Exactly how it all worked, and why the situation unfolded the way it did",
+          "v": "A"
+        },
+        {
+          "t": "What they could have done differently, and what applies to my own life",
+          "v": "B"
+        },
+        {
+          "t": "What was obvious in this situation but that everyone preferred not to notice",
+          "v": "C"
+        },
+        {
+          "t": "What it meant for the people involved — how they experienced it",
+          "v": "D"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "text": "You need to make an important decision under uncertainty. You:",
+      "opts": [
+        {
+          "t": "Choose the most promising option and start moving — you'll figure it out along the way",
+          "v": "B"
+        },
+        {
+          "t": "Check which assumptions behind the options are left unnamed — those are usually what fail",
+          "v": "C"
+        },
+        {
+          "t": "Think about which decision will be aligned with your values",
+          "v": "D"
+        },
+        {
+          "t": "Gather more information to better understand the situation",
+          "v": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "text": "A conflict has come up among friends or in your family. Your role in it:",
+      "opts": [
+        {
+          "t": "I name what others avoid saying out loud — even if it's uncomfortable",
+          "v": "C"
+        },
+        {
+          "t": "I try to understand what's behind each person's position and create space for dialogue",
+          "v": "D"
+        },
+        {
+          "t": "I try to work out the causes and understand how this conflict came about",
+          "v": "A"
+        },
+        {
+          "t": "I want to find a solution quickly and move on",
+          "v": "B"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "text": "You learn about a new idea or concept. What happens next?",
+      "opts": [
+        {
+          "t": "I think about what meaning it carries and how it changes my understanding of the world",
+          "v": "D"
+        },
+        {
+          "t": "I want to understand its logic and structure — how it works on the inside",
+          "v": "A"
+        },
+        {
+          "t": "I immediately think about where and how it could be applied",
+          "v": "B"
+        },
+        {
+          "t": "I notice where there are contradictions or weak points in it",
+          "v": "C"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "text": "You're finishing a major undertaking you put a lot of effort into. What do you feel first?",
+      "opts": [
+        {
+          "t": "I want to understand what went well in this, what didn't, and why",
+          "v": "A"
+        },
+        {
+          "t": "I'm already thinking about the next step — what can be done next",
+          "v": "B"
+        },
+        {
+          "t": "I see what could have been done better — and what got in the way of that",
+          "v": "C"
+        },
+        {
+          "t": "I think about what this meant for me and for the people I did it with",
+          "v": "D"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "text": "Someone tells you about a person you don't know. What interests you most?",
+      "opts": [
+        {
+          "t": "What they do and what they've achieved",
+          "v": "B"
+        },
+        {
+          "t": "How well their words match their actions",
+          "v": "C"
+        },
+        {
+          "t": "What matters to them and what drives them",
+          "v": "D"
+        },
+        {
+          "t": "How they think and the logic behind their actions",
+          "v": "A"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "text": "You're preparing for an important conversation. You spend most of your time on:",
+      "opts": [
+        {
+          "t": "Preparing arguments about what's going wrong and why it matters to change it",
+          "v": "C"
+        },
+        {
+          "t": "Understanding what matters to the other person and what this conversation means for both of you",
+          "v": "D"
+        },
+        {
+          "t": "Understanding the context and logic of the situation — what led to it",
+          "v": "A"
+        },
+        {
+          "t": "Thinking through exactly what you want to propose or change",
+          "v": "B"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "text": "You've received unexpected feedback about yourself. Your first reaction:",
+      "opts": [
+        {
+          "t": "I think about what this feedback means for my understanding of myself",
+          "v": "D"
+        },
+        {
+          "t": "I want to understand what this assessment is based on and how objective it is",
+          "v": "A"
+        },
+        {
+          "t": "I think about what specifically I can change in my behavior",
+          "v": "B"
+        },
+        {
+          "t": "I check how honest this feedback is and whether it contradicts other facts",
+          "v": "C"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "text": "You see that a plan isn't working. What do you do?",
+      "opts": [
+        {
+          "t": "I analyze exactly where it broke down and why",
+          "v": "A"
+        },
+        {
+          "t": "I quickly adapt the plan and keep moving",
+          "v": "B"
+        },
+        {
+          "t": "I say plainly where the plan didn't add up from the start — so the next one doesn't repeat it",
+          "v": "C"
+        },
+        {
+          "t": "I think about what this situation teaches us and what's important to hold on to",
+          "v": "D"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "text": "You're studying a new field. How do you go about it?",
+      "opts": [
+        {
+          "t": "I try applying it right away — I learn by doing, filling in the gaps as I go",
+          "v": "B"
+        },
+        {
+          "t": "I go where the experts disagree — that's where you see what is actually still unsettled",
+          "v": "C"
+        },
+        {
+          "t": "I look for meaning and a connection to what already matters to me",
+          "v": "D"
+        },
+        {
+          "t": "Systematically — I build understanding from fundamentals to details",
+          "v": "A"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "text": "In a conversation, you notice the other person is saying one thing but means another. You:",
+      "opts": [
+        {
+          "t": "I name the contradiction directly — it matters for an honest conversation",
+          "v": "C"
+        },
+        {
+          "t": "I try to understand what they're actually feeling and what they don't dare say",
+          "v": "D"
+        },
+        {
+          "t": "I try to understand what's behind their words — the logic of their position",
+          "v": "A"
+        },
+        {
+          "t": "I focus on what can be done about what they actually want",
+          "v": "B"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "text": "You need to explain a complex idea to someone else. You:",
+      "opts": [
+        {
+          "t": "I look for an image or story that will resonate and bring the idea to life",
+          "v": "D"
+        },
+        {
+          "t": "I build the explanation from logic to detail — structure first, then the parts",
+          "v": "A"
+        },
+        {
+          "t": "I show, with an example, how it works in practice",
+          "v": "B"
+        },
+        {
+          "t": "I first separate what is easy to confuse — otherwise the idea lands on the wrong footing",
+          "v": "C"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "text": "You watch a group of people making a decision. What do you notice first?",
+      "opts": [
+        {
+          "t": "The logic of the process — how the discussion is structured and what the arguments are based on",
+          "v": "A"
+        },
+        {
+          "t": "Whether the group has a sense of the next step and is moving toward a result",
+          "v": "B"
+        },
+        {
+          "t": "The gap between what is agreed out loud and what actually decides the outcome",
+          "v": "C"
+        },
+        {
+          "t": "How the people feel during this process",
+          "v": "D"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "text": "You're going through a difficult period in your life. What helps you move forward?",
+      "opts": [
+        {
+          "t": "Focusing on concrete steps — what I can do right now",
+          "v": "B"
+        },
+        {
+          "t": "Clarity about exactly what went wrong and what needs to change",
+          "v": "C"
+        },
+        {
+          "t": "Understanding the meaning of what's happening — why it's happening and what it teaches",
+          "v": "D"
+        },
+        {
+          "t": "Understanding how this situation is put together and what its causes are",
+          "v": "A"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "text": "You're taking part in a discussion of a shared plan. Your main contribution:",
+      "opts": [
+        {
+          "t": "I point out weak spots and assumptions that could turn into problems",
+          "v": "C"
+        },
+        {
+          "t": "I raise the question of what this plan is for — why we're doing this",
+          "v": "D"
+        },
+        {
+          "t": "I ask questions about how everything connects — I look for the logic",
+          "v": "A"
+        },
+        {
+          "t": "I suggest concrete steps and entry points — where we could start right now",
+          "v": "B"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "text": "You hear a story about someone's success. What interests you most?",
+      "opts": [
+        {
+          "t": "What this experience meant for the person — how it changed them",
+          "v": "D"
+        },
+        {
+          "t": "Exactly how it was achieved — the logic of the path they took",
+          "v": "A"
+        },
+        {
+          "t": "What from this can be applied to my own situation",
+          "v": "B"
+        },
+        {
+          "t": "What's actually behind this success",
+          "v": "C"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "text": "You need to write an important letter. Where do you start?",
+      "opts": [
+        {
+          "t": "With logic — I build the structure of the arguments first",
+          "v": "A"
+        },
+        {
+          "t": "With the main conclusion — what I want the person to do after reading it",
+          "v": "B"
+        },
+        {
+          "t": "With whatever could be read two ways — I remove the places where the meaning can be swapped",
+          "v": "C"
+        },
+        {
+          "t": "With what the reader will feel — what tone will create the right connection",
+          "v": "D"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "text": "A project you're involved in is moving in the wrong direction. You:",
+      "opts": [
+        {
+          "t": "I propose a concrete change of course and am willing to take responsibility for it",
+          "v": "B"
+        },
+        {
+          "t": "I say plainly that the direction is wrong — and explain why",
+          "v": "C"
+        },
+        {
+          "t": "I raise the question of what we're doing all this for",
+          "v": "D"
+        },
+        {
+          "t": "I first want to understand at what point and why the shift happened",
+          "v": "A"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "text": "You find out that someone you trusted acted dishonestly. Your first reaction:",
+      "opts": [
+        {
+          "t": "This confirms what I'd noticed — and what should have been named sooner",
+          "v": "C"
+        },
+        {
+          "t": "I feel the break in trust — I think about what this means for our relationship",
+          "v": "D"
+        },
+        {
+          "t": "I want to understand how this became possible — what I missed",
+          "v": "A"
+        },
+        {
+          "t": "I think about what needs to change in the situation to move forward",
+          "v": "B"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "text": "At the end of the day, you think about what happened. What occupies your thoughts?",
+      "opts": [
+        {
+          "t": "I think about what was real in this day — what actually mattered",
+          "v": "D"
+        },
+        {
+          "t": "I try to connect the events of the day into a single picture — what led to what",
+          "v": "A"
+        },
+        {
+          "t": "I think about what moved forward and what needs to happen tomorrow",
+          "v": "B"
+        },
+        {
+          "t": "I notice where words and deeds parted ways today — mine and other people's",
+          "v": "C"
+        }
+      ]
+    }
+  ],
+  "Q2": [
+    {
+      "id": 1,
+      "text": "Past failures continue to affect how I make decisions today.",
+      "f": "PN"
+    },
+    {
+      "id": 2,
+      "text": "When something goes wrong, I tend to think that's just how it always goes for me.",
+      "f": "PN"
+    },
+    {
+      "id": 3,
+      "text": "Painful past experiences often get in the way of me acting confidently in the present.",
+      "f": "PN"
+    },
+    {
+      "id": 4,
+      "text": "Memories of good times give me support when things are difficult now.",
+      "f": "PP"
+    },
+    {
+      "id": 5,
+      "text": "Past experience is my main resource — that's where I find what works.",
+      "f": "PP"
+    },
+    {
+      "id": 6,
+      "text": "I like revisiting stories from my life — they help me understand who I am.",
+      "f": "PP"
+    },
+    {
+      "id": 7,
+      "text": "I rarely believe I can significantly change what happens in my life.",
+      "f": "NF"
+    },
+    {
+      "id": 8,
+      "text": "What happens to me often feels like the result of circumstances rather than my own decisions.",
+      "f": "NF"
+    },
+    {
+      "id": 9,
+      "text": "There's no point planning for the future — things never turn out the way they're planned anyway.",
+      "f": "NF"
+    },
+    {
+      "id": 10,
+      "text": "I live in the present moment — and I find it hard to think about the consequences of the distant future.",
+      "f": "NH"
+    },
+    {
+      "id": 11,
+      "text": "Spontaneous decisions often turn out to be the best ones — it's better to act than to plan.",
+      "f": "NH"
+    },
+    {
+      "id": 12,
+      "text": "It matters to me to enjoy what's happening right now.",
+      "f": "NH"
+    },
+    {
+      "id": 13,
+      "text": "I often think about what I want to achieve — and I build concrete plans for it.",
+      "f": "F"
+    },
+    {
+      "id": 14,
+      "text": "My decisions today are shaped by where I want to be in the future.",
+      "f": "F"
+    },
+    {
+      "id": 15,
+      "text": "I'm willing to give up immediate pleasure for a long-term result.",
+      "f": "F"
+    }
+  ],
+  "Q3": [
+    {
+      "id": 1,
+      "text": "When I tell someone what happened, it feels like I'm just stating the facts — not my own version of events.",
+      "lv": 1,
+      "inv": true
+    },
+    {
+      "id": 2,
+      "text": "When something keeps repeating in my life, it feels more like a feature of the world or other people than my own habitual reactions.",
+      "lv": 1,
+      "inv": true
+    },
+    {
+      "id": 3,
+      "text": "When someone sees the same situation completely differently than I do, I find it hard to understand how that's possible.",
+      "lv": 1,
+      "inv": true
+    },
+    {
+      "id": 4,
+      "text": "I notice that I react in roughly the same way in similar situations — and I can name it.",
+      "lv": 2,
+      "inv": false
+    },
+    {
+      "id": 5,
+      "text": "I can see the difference between what happened and what I think about it.",
+      "lv": 2,
+      "inv": false
+    },
+    {
+      "id": 6,
+      "text": "Sometimes I catch myself reacting out of habit — even though the situation might call for a different approach.",
+      "lv": 2,
+      "inv": false
+    },
+    {
+      "id": 7,
+      "text": "When I deliberately look at a situation from a different angle, my reaction actually changes.",
+      "lv": 3,
+      "inv": false
+    },
+    {
+      "id": 8,
+      "text": "Once I understand which habitual script is kicking in, I can choose to act differently.",
+      "lv": 3,
+      "inv": false
+    },
+    {
+      "id": 9,
+      "text": "I regularly track my habitual ways of explaining what happens — and change them when they're not helping me.",
+      "lv": 3,
+      "inv": false
+    },
+    {
+      "id": 10,
+      "text": "I can see how my personal beliefs are connected to the beliefs of the group or culture I grew up in.",
+      "lv": 4,
+      "inv": false
+    },
+    {
+      "id": 11,
+      "text": "I know how to work with other people's habitual reactions and beliefs — not just my own.",
+      "lv": 4,
+      "inv": false
+    },
+    {
+      "id": 12,
+      "text": "I can calmly hold the tension between different points of view without rushing to resolve it immediately.",
+      "lv": 4,
+      "inv": false
+    }
+  ]
+}
