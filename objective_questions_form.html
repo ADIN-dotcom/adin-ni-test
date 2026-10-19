@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Три вопроса о цели · ADIN</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1E3A5F;--navy-mid:#2d5a8e;--navy-s:#dce8f5;
+  --cream:#f8f6f0;--cream-d:#ede8df;
+  --ink:#1a1a2e;--ink-soft:#4a4a6a;--ink-faint:#8888a8;
+  --green:#2D6A4F;--green-s:#e8f3ec;
+  --red:#C8432A;--red-s:#fee2e2;
+  --gold:#c9a84c;--gold-s:#fff8e1;
+  --white:#fff;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  background:var(--cream);color:var(--ink);min-height:100vh;
+  display:flex;flex-direction:column}
+
+.header{background:var(--navy);padding:16px 24px;display:flex;
+  align-items:center;justify-content:space-between}
+.logo{color:#fff;font-size:20px;font-weight:700;letter-spacing:.02em}
+.logo-sub{color:#9aafc8;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.progress-wrap{display:flex;align-items:center;gap:10px}
+.progress-bar{width:160px;height:4px;background:rgba(255,255,255,.2);border-radius:2px}
+.progress-fill{height:100%;background:#fff;border-radius:2px;transition:width .4s}
+.progress-txt{color:#9aafc8;font-size:12px}
+
+.screen{display:none;flex:1;flex-direction:column}
+.screen.active{display:flex}
+
+/* ВХОД ПО КОДУ */
+.login-wrap{max-width:480px;margin:64px auto;padding:0 24px;text-align:center}
+.login-wrap h1{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.login-wrap p{font-size:15px;color:var(--ink-soft);line-height:1.7;margin-bottom:32px}
+.code-input{width:100%;padding:16px;text-align:center;font-size:24px;
+  font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  border:2px solid var(--cream-d);border-radius:10px;
+  font-family:inherit;color:var(--navy);background:#fff;transition:border .2s}
+.code-input:focus{outline:none;border-color:var(--navy)}
+.btn-enter{display:inline-block;margin-top:20px;width:100%;padding:14px;
+  background:var(--navy);color:#fff;border-radius:10px;font-size:16px;
+  font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:background .18s}
+.btn-enter:hover{background:var(--navy-mid)}
+.btn-enter:disabled{background:#b0bcc8;cursor:not-allowed}
+.login-error{color:var(--red);font-size:14px;margin-top:12px;display:none}
+
+/* ИНТРО */
+.intro-wrap{max-width:600px;margin:48px auto;padding:0 24px;text-align:center}
+.intro-wrap h1{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.intro-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7;margin-bottom:16px}
+.block-badges{display:flex;gap:10px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500}
+.badge-1{background:var(--navy-s);color:var(--navy)}
+.badge-2{background:var(--gold-s);color:#7b5800}
+.badge-3{background:var(--green-s);color:var(--green)}
+.btn-start{display:inline-block;padding:14px 36px;background:var(--navy);
+  color:#fff;border-radius:10px;font-size:16px;font-weight:500;
+  cursor:pointer;border:none;font-family:inherit;transition:background .18s}
+.btn-start:hover{background:var(--navy-mid)}
+
+/* ВОПРОСЫ */
+.q-wrap{max-width:680px;margin:0 auto;padding:32px 24px;flex:1;
+  display:flex;flex-direction:column}
+.q-block-label{font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:20px}
+.q-num{font-size:13px;color:var(--ink-faint);margin-bottom:8px}
+.q-text{font-size:20px;font-weight:500;color:var(--ink);line-height:1.5;margin-bottom:8px}
+.q-hint{font-size:13px;color:var(--ink-faint);font-style:italic;margin-bottom:24px;line-height:1.5}
+.q-input{width:100%;min-height:120px;padding:14px 16px;
+  border:2px solid var(--cream-d);border-radius:10px;
+  font-size:15px;font-family:inherit;color:var(--ink);
+  background:#fff;resize:vertical;line-height:1.6;transition:border .2s}
+.q-input:focus{outline:none;border-color:var(--navy)}
+.q-input.short{min-height:60px}
+.q-nav{display:flex;justify-content:space-between;align-items:center;
+  margin-top:24px;padding-top:20px;border-top:1px solid var(--cream-d)}
+.btn-nav{padding:11px 24px;border-radius:8px;font-size:15px;
+  font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .18s}
+.btn-back{background:var(--cream-d);color:var(--ink-soft)}
+.btn-back:hover{background:#e0dbd4}
+.btn-next{background:var(--navy);color:#fff}
+.btn-next:hover{background:var(--navy-mid)}
+.btn-next:disabled{background:#b0bcc8;cursor:not-allowed}
+.char-count{font-size:12px;color:var(--ink-faint)}
+.error-msg{color:var(--red);font-size:13px;margin-top:8px;display:none}
+
+/* ФИНИШ */
+.finish-wrap{max-width:560px;margin:64px auto;padding:0 24px;text-align:center}
+.finish-icon{font-size:56px;margin-bottom:24px}
+.finish-wrap h2{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.finish-wrap p{font-size:16px;color:var(--ink-soft);line-height:1.7}
+  @keyframes ns-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">ADIN</div>
+    <div class="logo-sub" id="logo-sub">Нарратив будущего</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-txt" id="progress-txt"></div>
+  </div>
+</div>
+
+<!-- ВХОД ПО КОДУ -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <h1 id="login-title">Три вопроса о цели</h1>
+    <p id="login-sub">Введите код доступа из письма-приглашения</p>
+    <input class="code-input" id="code-input" type="text"
+      placeholder="ADIN-XXXX" maxlength="9"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')enter()">
+    <div class="login-error" id="login-error">Код не найден. Проверьте письмо и попробуйте снова.</div>
+    <button class="btn-enter" id="btn-enter" onclick="enter()">Войти →</button>
+  </div>
+</div>
+
+<!-- ИНТРО -->
+<div class="screen" id="screen-intro">
+  <div class="intro-wrap">
+    <h1 id="intro-title">Три вопроса о цели</h1>
+    <p id="intro-text"></p>
+    <p class="q-hint" id="intro-note" style="margin-top:16px"></p>
+    <button class="btn-start" id="btn-start" onclick="start()">Начать</button>
+  </div>
+</div>
+
+<!-- ВОПРОСЫ -->
+<div class="screen" id="screen-q">
+  <div class="q-wrap">
+    <div class="q-block-label" id="q-block"></div>
+    <div class="q-num" id="q-num"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-hint" id="q-hint"></div>
+    <textarea class="q-input" id="q-answer" placeholder="Ваш ответ..." oninput="onInput()"></textarea>
+    <select class="q-input" id="q-choice" style="display:none" onchange="onInput()"></select>
+    <div class="error-msg" id="error-msg">Пожалуйста, ответьте на вопрос</div>
+    <div class="q-nav">
+      <button class="btn-nav btn-back" id="btn-back" onclick="goBack()">← Назад</button>
+      <span class="char-count" id="char-count"></span>
+      <button class="btn-nav btn-next" id="btn-next" onclick="goNext()">Далее →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ГОТОВО -->
+<div class="screen" id="screen-finish">
+  <div class="finish-wrap">
+    <div class="finish-icon">✓</div>
+    <h1 id="finish-title">Спасибо!</h1>
+    <p id="finish-text">Ваши ответы получены.</p>
+  </div>
+</div>
+
+<!-- ОШИБКА -->
+<div class="screen" id="screen-error">
+  <div class="finish-wrap">
+    <h1 id="error-title">Не удалось отправить ответы</h1>
+    <p id="error-detail"></p>
+    <button class="btn-nav btn-next" style="margin-top:18px" onclick="submitForm()">Повторить отправку</button>
+  </div>
+</div>
+
+<script>
+// Три вопроса о цели — отдельная форма.
+//
+// Те же вопросы могут приезжать прицепом в конце Нарративного статуса, если у
+// группы включён флаг ask_in_sn. Эта форма нужна там, где SN уже пройден
+// (ретропрогон по существующим группам) и там, где заказчику нужна только
+// исполнимость. Ответы ложатся в ту же таблицу v2_objective_answers.
+const API = '/api';
+
+const T = {
+  ru: {
+    title: 'Три вопроса о цели',
+    intro: 'Ваша компания поставила цель. Три коротких вопроса о ней — около трёх минут.',
+    note: 'Правильных ответов нет, и ответы не оцениваются: они сравниваются между собой по всей группе. Отвечайте так, как считаете вы, даже если не уверены. Руководителю результаты показываются только в групповом виде.',
+    block: 'Цель компании',
+    num: 'Вопрос {n} из 3',
+    q1: 'Своими словами: какую задачу компания должна решить{d}?',
+    q1h: 'Одно предложение. Не формулировку с совещания, а так, как сказали бы коллеге.',
+    q2: 'Кто отвечает за то, чтобы это произошло?',
+    q2h: 'Один человек. Если отвечают несколько — тот, кто отвечает больше всех.',
+    q3: 'Что в этом результате зависит лично от вас?',
+    q3h: 'Одно-два предложения. Если считаете, что не зависит ничего — так и напишите.',
+    outside: 'Кто-то вне этого списка', unknown: 'Не знаю',
+    err_short: 'Пожалуйста, напишите хотя бы несколько слов',
+    err_choice: 'Пожалуйста, выберите вариант',
+    sending: 'Отправляем…', submit: 'Отправить ✓', next: 'Далее →',
+    done: 'Спасибо!', done_text: 'Ваши ответы получены и переданы ведущему программы.',
+    used: 'Этот код уже был использован.',
+    no_obj: 'Для вашей группы ещё не задана цель. Обратитесь к организатору.',
+    not_found: 'Код не найден. Проверьте письмо и попробуйте снова.',
+    conn: 'Ошибка соединения. Попробуйте позже.',
+  },
+  en: {
+    title: 'Three questions about the objective',
+    intro: 'Your company has set an objective. Three short questions about it — about three minutes.',
+    note: 'There are no right answers and answers are not graded: they are compared with each other across the group. Answer the way you see it, even if you are unsure. Your leader sees group-level results only.',
+    block: 'Company objective',
+    num: 'Question {n} of 3',
+    q1: 'In your own words: what task should the company solve{d}?',
+    q1h: 'One sentence. Not the wording from a meeting — the way you would tell a colleague.',
+    q2: 'Who is responsible for making it happen?',
+    q2h: 'One person. If several are responsible — the one who is most.',
+    q3: 'What in this result depends on you personally?',
+    q3h: 'One or two sentences. If you think nothing does — write that.',
+    outside: 'Someone outside this list', unknown: "I don't know",
+    err_short: 'Please write at least a few words',
+    err_choice: 'Please choose an option',
+    sending: 'Sending…', submit: 'Submit ✓', next: 'Next →',
+    done: 'Thank you!', done_text: 'Your answers have been received and passed to the facilitator.',
+    used: 'This code has already been used.',
+    no_obj: 'No objective has been set for your group yet. Please contact the organiser.',
+    not_found: 'Code not found. Check the email and try again.',
+    conn: 'Connection error. Please try again later.',
+  },
+};
+
+let LANG = 'ru', t = T.ru;
+let accessCode = '', OBJECTIVE = null, ROLES = [];
+let QS = [], current = 0;
+const answers = {};
+
+const el = (id) => document.getElementById(id);
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  el(id).classList.add('active');
+}
+const draftKey = () => accessCode ? 'adin_obj_' + accessCode : null;
+function saveDraft() {
+  try { const k = draftKey(); if (k) localStorage.setItem(k, JSON.stringify({ answers, current })); } catch (e) {}
+}
+function loadDraft() {
+  try {
+    const k = draftKey(); const s = k && localStorage.getItem(k); if (!s) return;
+    const d = JSON.parse(s);
+    if (d && d.answers) Object.assign(answers, d.answers);
+    if (d && typeof d.current === 'number') current = Math.max(0, Math.min(d.current, 2));
+  } catch (e) {}
+}
+function clearDraft() { try { const k = draftKey(); if (k) localStorage.removeItem(k); } catch (e) {} }
+
+function buildQuestions() {
+  const d = OBJECTIVE.deadline ? String(OBJECTIVE.deadline).slice(0, 7) : '';
+  const by = d ? (LANG === 'en' ? ' by ' + d : ' к ' + d) : '';
+  // Должности, а не имена: имён нет ни в одной базе, и на RU их быть не должно.
+  const opts = ROLES.map(r => ({ v: 'role:' + r, t: r }));
+  opts.push({ v: 'outside', t: t.outside });
+  opts.push({ v: 'unknown', t: t.unknown });
+  QS = [
+    { k: 'task_text', text: t.q1.replace('{d}', by), hint: t.q1h },
+    { k: 'owner',     text: t.q2, hint: t.q2h, choices: opts },
+    { k: 'own_part',  text: t.q3, hint: t.q3h },
+  ];
+}
+
+async function enter() {
+  const code = el('code-input').value.trim().toUpperCase();
+  if (!code || code.length < 6) { el('login-error').textContent = t.not_found; el('login-error').style.display = 'block'; return; }
+  const btn = el('btn-enter'); btn.disabled = true;
+  el('login-error').style.display = 'none';
+  try {
+    const r = await fetch(API + '/objectives/for-code/' + encodeURIComponent(code));
+    const data = await r.json();
+    if (data.redirect) { location.replace(data.redirect); return; }
+    if (!data.valid) {
+      const reason = data.reason === 'already_used' ? t.used
+                   : data.reason === 'no_objective' ? t.no_obj : t.not_found;
+      el('login-error').textContent = reason; el('login-error').style.display = 'block';
+      btn.disabled = false; return;
+    }
+    accessCode = code;
+    LANG = data.language === 'en' ? 'en' : 'ru'; t = T[LANG];
+    OBJECTIVE = data.objective; ROLES = data.roles || [];
+    buildQuestions();
+    loadDraft();
+    document.documentElement.lang = LANG;
+    el('intro-title').textContent = t.title;
+    el('intro-text').textContent = t.intro;
+    el('intro-note').textContent = t.note;
+    el('finish-title').textContent = t.done;
+    el('finish-text').textContent = t.done_text;
+    showScreen('screen-intro');
+  } catch (e) {
+    el('login-error').textContent = t.conn; el('login-error').style.display = 'block';
+    btn.disabled = false;
+  }
+}
+
+function start() { showScreen('screen-q'); render(); }
+
+function render() {
+  const q = QS[current];
+  el('q-block').textContent = t.block;
+  el('q-num').textContent = t.num.replace('{n}', current + 1);
+  el('q-text').textContent = q.text;
+  el('q-hint').textContent = q.hint || '';
+  const ta = el('q-answer'), sel = el('q-choice');
+  if (q.choices) {
+    sel.innerHTML = '<option value=""></option>' +
+      q.choices.map(o => '<option value="' + o.v + '">' + o.t + '</option>').join('');
+    sel.value = answers[q.k] || '';
+    ta.style.display = 'none'; sel.style.display = 'block'; sel.focus();
+  } else {
+    sel.style.display = 'none'; ta.style.display = 'block';
+    ta.value = answers[q.k] || ''; ta.focus();
+  }
+  el('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
+  el('btn-next').textContent = current === QS.length - 1 ? t.submit : t.next;
+  el('error-msg').style.display = 'none';
+  el('progress').style.width = Math.round((current / QS.length) * 100) + '%';
+  el('progress-txt').textContent = (current + 1) + ' / ' + QS.length;
+}
+
+function onInput() {
+  const q = QS[current];
+  answers[q.k] = q.choices ? el('q-choice').value : el('q-answer').value;
+  el('error-msg').style.display = 'none';
+  saveDraft();
+}
+
+function goBack() { if (current > 0) { current--; render(); } }
+
+function goNext() {
+  const q = QS[current];
+  const val = q.choices ? el('q-choice').value : el('q-answer').value.trim();
+  // «Не знаю» и «ничего не зависит» — полноценные ответы, но пустое поле нет.
+  if (!val || (!q.choices && val.length < 2)) {
+    el('error-msg').textContent = q.choices ? t.err_choice : t.err_short;
+    el('error-msg').style.display = 'block'; return;
+  }
+  answers[q.k] = val;
+  saveDraft();
+  if (current < QS.length - 1) { current++; render(); } else { submitForm(); }
+}
+
+async function submitForm() {
+  const btn = el('btn-next');
+  btn.disabled = true; btn.textContent = t.sending;
+  try {
+    const choice = String(answers.owner || '');
+    const r = await fetch(API + '/objectives/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: accessCode,
+        answers: {
+          task_text: answers.task_text || null,
+          owner_choice: choice.startsWith('role:') ? 'role' : (choice || null),
+          owner_role: choice.startsWith('role:') ? choice.slice(5) : null,
+          own_part: answers.own_part || null,
+        },
+      }),
+    });
+    const data = await r.json();
+    if (!data.success) throw new Error(data.error || t.conn);
+    clearDraft();
+    el('progress').style.width = '100%';
+    showScreen('screen-finish');
+  } catch (err) {
+    el('error-detail').textContent = err.message;
+    btn.disabled = false; btn.textContent = t.submit;
+    showScreen('screen-error');
+  }
+}
+
+// Код из ссылки: письмо ведёт сразу на форму с подставленным кодом.
+(function () {
+  const c = new URLSearchParams(location.search).get('code');
+  if (c) { el('code-input').value = c.toUpperCase(); enter(); }
+})();
+</script>
+</body>
+</html>

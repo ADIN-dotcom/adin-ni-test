@@ -164,6 +164,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     <div class="q-hint" id="q-hint"></div>
     <textarea class="q-input" id="q-answer" placeholder="Ваш ответ..."
       oninput="onInput()"></textarea>
+    <select class="q-input short" id="q-choice" style="display:none" onchange="onInput()"></select>
     <div class="error-msg" id="error-msg">Пожалуйста, напишите хотя бы несколько слов</div>
     <div class="q-nav">
       <button class="btn-nav btn-back" onclick="goBack()" id="btn-back">← Назад</button>
@@ -331,6 +332,46 @@ const QUESTIONS_BY_LANG = {
 };
 let QUESTIONS = QUESTIONS_BY_LANG.ru;
 
+// ── ЦЕЛЬ ─────────────────────────────────────────────────────────────────────
+// Если у группы есть активный паспорт цели, в конец опросника дописываются три
+// вопроса о ней. Они не часть нарративного статуса: при отправке уходят
+// отдельным полем и в анализ НС не попадают.
+let OBJECTIVE = null, OBJECTIVE_ROLES = [], invitationId = null, draftCurrent = null;
+const OBJ_PREFIX = 'G';
+
+function objectiveQuestions() {
+  if (!OBJECTIVE) return [];
+  const ru = LANG !== 'en';
+  const d = OBJECTIVE.deadline ? String(OBJECTIVE.deadline).slice(0, 7) : '';
+  const block = ru ? '④ Цель' : '④ The objective';
+  // Должности, а не имена: имён нет ни в одной базе, и на RU их быть не должно.
+  const opts = OBJECTIVE_ROLES.map(r => ({ v: 'role:' + r, t: r }));
+  opts.push({ v: 'outside',  t: ru ? 'Кто-то вне этого списка' : 'Someone outside this list' });
+  opts.push({ v: 'unknown',  t: ru ? 'Не знаю' : "I don't know" });
+  return [
+    { block, n: 'G1', short: false,
+      text: ru ? ('Своими словами: какую задачу компания должна решить' + (d ? ' к ' + d : '') + '?')
+               : ('In your own words: what task should the company solve' + (d ? ' by ' + d : '') + '?'),
+      hint: ru ? 'Одно предложение. Не формулировку с совещания, а так, как сказали бы коллеге.'
+               : 'One sentence. Not the wording from a meeting — the way you would tell a colleague.' },
+    { block, n: 'G2', short: true, choices: opts,
+      text: ru ? 'Кто отвечает за то, чтобы это произошло?' : 'Who is responsible for making it happen?',
+      hint: ru ? 'Один человек. Если отвечают несколько — тот, кто отвечает больше всех.'
+               : 'One person. If several are responsible — the one who is most.' },
+    { block, n: 'G3', short: false,
+      text: ru ? 'Что в этом результате зависит лично от вас?' : 'What in this result depends on you personally?',
+      hint: ru ? 'Одно-два предложения. Если считаете, что не зависит ничего — так и напишите.'
+               : "One or two sentences. If you think nothing does — write that." },
+  ];
+}
+
+function applyObjective() {
+  const extra = objectiveQuestions();
+  if (!extra.length) return;
+  QUESTIONS = QUESTIONS.concat(extra);
+  if (draftCurrent !== null) current = Math.min(draftCurrent, QUESTIONS.length - 1);
+}
+
 function applyLanguage(lang) {
   LANG = CONTENT[lang] ? lang : 'ru';
   QUESTIONS = QUESTIONS_BY_LANG[LANG] || QUESTIONS_BY_LANG.ru;
@@ -375,7 +416,10 @@ function loadDraft() {
     const k = draftKey(); const s = k && localStorage.getItem(k); if (!s) return;
     const d = JSON.parse(s);
     if (d && d.answers) Object.assign(answers, d.answers);
-    if (d && typeof d.current === 'number') current = Math.max(0, Math.min(d.current, QUESTIONS.length - 1));
+    if (d && typeof d.current === 'number') {
+      draftCurrent = Math.max(0, d.current);
+      current = Math.min(draftCurrent, QUESTIONS.length - 1);
+    }
   } catch (e) {}
 }
 function clearDraft() { try { const k = draftKey(); if (k) localStorage.removeItem(k); } catch (e) {} }
@@ -405,9 +449,19 @@ async function verifyCode() {
       loadDraft();
       participantId = data.participant_id || null;
       groupId = data.groupId || null;
+      invitationId = data.invitation_id || null;
+      OBJECTIVE = data.objective || null;
+      OBJECTIVE_ROLES = data.objective_roles || [];
       // Язык зафиксирован при выдаче кода: переключаем форму целиком до того,
       // как показать интро, — иначе участник увидит смесь языков.
       applyLanguage(data.language || 'ru');
+      applyObjective();
+      if (OBJECTIVE) {
+        const it = document.getElementById('intro-text');
+        if (it) it.innerHTML += (LANG === 'en')
+          ? '<br><br>At the end — three short questions about the goal your company has set.'
+          : '<br><br>В конце — три коротких вопроса о цели, которую поставила ваша компания.';
+      }
       const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
       document.getElementById('intro-title').textContent =
         name ? UI().intro_hello.replace('{name}', name) : UI().intro_title;
@@ -594,10 +648,19 @@ function renderQuestion() {
   hint.style.display = q.hint ? 'block' : 'none';
 
   const ta = document.getElementById('q-answer');
-  ta.className = 'q-input' + (q.short ? ' short' : '');
-  ta.value = answers[q.n] || '';
-  if (q.prefix && !ta.value) ta.value = q.prefix;
-  ta.focus();
+  const sel = document.getElementById('q-choice');
+  if (q.choices) {
+    sel.innerHTML = '<option value=""></option>' +
+      q.choices.map(o => '<option value="' + o.v + '">' + o.t + '</option>').join('');
+    sel.value = answers[q.n] || '';
+    ta.style.display = 'none'; sel.style.display = 'block'; sel.focus();
+  } else {
+    sel.style.display = 'none'; ta.style.display = 'block';
+    ta.className = 'q-input' + (q.short ? ' short' : '');
+    ta.value = answers[q.n] || '';
+    if (q.prefix && !ta.value) ta.value = q.prefix;
+    ta.focus();
+  }
 
   document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
   document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? UI().btn_submit : UI().btn_next;
@@ -610,13 +673,17 @@ function onInput() {
   updateCharCount();
   document.getElementById('error-msg').style.display = 'none';
   // Черновик пишем на каждом вводе: даже незаконченный ответ не пропадёт.
-  answers[QUESTIONS[current].n] = document.getElementById('q-answer').value;
+  const qi = QUESTIONS[current];
+  answers[qi.n] = qi.choices
+    ? document.getElementById('q-choice').value
+    : document.getElementById('q-answer').value;
   saveDraft();
 }
 
 function updateCharCount() {
-  const val = document.getElementById('q-answer').value.trim();
   const q = QUESTIONS[current];
+  if (q.choices) { document.getElementById('char-count').textContent = ''; return; }
+  const val = document.getElementById('q-answer').value.trim();
   const prefix = q.prefix || '';
   const actual = val.startsWith(prefix) ? val.slice(prefix.length) : val;
   document.getElementById('char-count').textContent = actual.length > 0 ? actual.length + UI().chars : '';
@@ -631,8 +698,16 @@ function updateProgress() {
 function goBack() { if (current > 0) { current--; renderQuestion(); } }
 
 function goNext() {
-  const val = document.getElementById('q-answer').value.trim();
   const q = QUESTIONS[current];
+  if (q.choices) {
+    const chosen = document.getElementById('q-choice').value;
+    if (!chosen) { document.getElementById('error-msg').style.display = 'block'; return; }
+    answers[q.n] = chosen;
+    if (current < QUESTIONS.length - 1) { current++; saveDraft(); renderQuestion(); }
+    else { saveDraft(); submitForm(); }
+    return;
+  }
+  const val = document.getElementById('q-answer').value.trim();
   const prefix = q.prefix || '';
   const actual = val.startsWith(prefix) ? val.slice(prefix.length).trim() : val;
   if (actual.length < 2) { document.getElementById('error-msg').style.display = 'block'; return; }
@@ -646,13 +721,29 @@ async function submitForm() {
   btn.disabled = true; btn.textContent = UI().btn_sending;
   showScreen('screen-loading');
   try {
+    // Ответы о цели вынимаем из общего набора: в анализ нарративного статуса
+    // они попадать не должны — это другой предмет и другая таблица.
+    const snAnswers = {}, obj = {};
+    for (const k of Object.keys(answers)) {
+      if (k[0] === OBJ_PREFIX) obj[k] = answers[k]; else snAnswers[k] = answers[k];
+    }
     const body = {
-      answers,
+      answers: snAnswers,
       code: accessCode,
       participant_id: participantId,
       group_id: groupId,
       language: LANG, // подсказка; язык сервер всё равно берёт из кода
     };
+    if (OBJECTIVE && (obj.G1 || obj.G2 || obj.G3)) {
+      const choice = String(obj.G2 || '');
+      body.invitation_id = invitationId;
+      body.objective_answers = {
+        task_text: obj.G1 || null,
+        owner_choice: choice.startsWith('role:') ? 'role' : (choice || null),
+        owner_role: choice.startsWith('role:') ? choice.slice(5) : null,
+        own_part: obj.G3 || null,
+      };
+    }
     const r = await fetch(API + '/narrative-status/submit', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -662,7 +753,7 @@ async function submitForm() {
     if (data.success) {
       clearDraft();
       document.getElementById('progress').style.width = '100%';
-      document.getElementById('progress-txt').textContent = '13 / 13';
+      document.getElementById('progress-txt').textContent = QUESTIONS.length + ' / ' + QUESTIONS.length;
       showScreen('screen-finish');
     } else {
       throw new Error((LANG === 'ru' && data.error) || UI().server_error);
