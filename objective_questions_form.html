@@ -127,6 +127,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     <h1 id="intro-title">Три вопроса о цели</h1>
     <p id="intro-text"></p>
     <p class="q-hint" id="intro-note" style="margin-top:16px"></p>
+    <div id="unit-wrap" style="display:none;margin-top:22px;text-align:left">
+      <div class="q-hint" id="unit-label" style="margin-bottom:6px"></div>
+      <select class="q-input" id="unit-sel" onchange="onUnit()"></select>
+      <div class="login-error" id="unit-error" style="display:none"></div>
+    </div>
     <button class="btn-start" id="btn-start" onclick="start()">Начать</button>
   </div>
 </div>
@@ -140,6 +145,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     <div class="q-hint" id="q-hint"></div>
     <textarea class="q-input" id="q-answer" placeholder="Ваш ответ..." oninput="onInput()"></textarea>
     <select class="q-input" id="q-choice" style="display:none" onchange="onInput()"></select>
+    <div id="q-extra" style="display:none">
+      <div class="q-hint" id="q-extra-label" style="margin-top:16px"></div>
+      <select class="q-input" id="q-extra-sel" onchange="onInput()"></select>
+    </div>
     <div class="error-msg" id="error-msg">Пожалуйста, ответьте на вопрос</div>
     <div class="q-nav">
       <button class="btn-nav btn-back" id="btn-back" onclick="goBack()">← Назад</button>
@@ -183,10 +192,19 @@ const T = {
     note: 'Правильных ответов нет, и ответы не оцениваются: они сравниваются между собой по всей группе. Отвечайте так, как считаете вы, даже если не уверены. Руководителю результаты показываются только в групповом виде.',
     block: 'Цель компании',
     num: 'Вопрос {n} из 3',
-    q1: 'Своими словами: какую задачу компания должна решить{d}?',
+    q1: 'Своими словами: какую основную задачу компания должна решить?',
     q1h: 'Одно предложение. Не формулировку с совещания, а так, как сказали бы коллеге.',
-    q2: 'Кто отвечает за то, чтобы это произошло?',
-    q2h: 'Один человек. Если отвечают несколько — тот, кто отвечает больше всех.',
+    q1d: 'К какому сроку?',
+    hz: ['до 6 месяцев', '6–12 месяцев', '1–2 года', 'больше 2 лет', 'не знаю'],
+    q2: 'Кто в большей степени отвечает за то, чтобы это произошло?',
+    q2h: 'Один человек из списка.',
+    q2b: 'Если ответственность реально разделена — кто ещё? (необязательно)',
+    q2bnone: 'Нет, не разделена',
+    grp_roles: 'Должности', grp_other: 'Другое',
+    unit: 'Из какого вы подразделения?',
+    unit_other: 'Другое',
+    err_unit: 'Пожалуйста, выберите подразделение',
+    err_horizon: 'Пожалуйста, выберите срок',
     q3: 'Что в этом результате зависит лично от вас?',
     q3h: 'Одно-два предложения. Если считаете, что не зависит ничего — так и напишите.',
     outside: 'Кто-то вне этого списка', unknown: 'Не знаю',
@@ -205,10 +223,19 @@ const T = {
     note: 'There are no right answers and answers are not graded: they are compared with each other across the group. Answer the way you see it, even if you are unsure. Your leader sees group-level results only.',
     block: 'Company objective',
     num: 'Question {n} of 3',
-    q1: 'In your own words: what task should the company solve{d}?',
+    q1: 'In your own words: what is the main task the company must solve?',
     q1h: 'One sentence. Not the wording from a meeting — the way you would tell a colleague.',
-    q2: 'Who is responsible for making it happen?',
-    q2h: 'One person. If several are responsible — the one who is most.',
+    q1d: 'By when?',
+    hz: ['under 6 months', '6–12 months', '1–2 years', 'more than 2 years', "I don't know"],
+    q2: 'Who is most responsible for making it happen?',
+    q2h: 'One person from the list.',
+    q2b: 'If responsibility is genuinely shared — who else? (optional)',
+    q2bnone: 'No, not shared',
+    grp_roles: 'Positions', grp_other: 'Other',
+    unit: 'Which unit are you in?',
+    unit_other: 'Other',
+    err_unit: 'Please choose a unit',
+    err_horizon: 'Please choose a timeframe',
     q3: 'What in this result depends on you personally?',
     q3h: 'One or two sentences. If you think nothing does — write that.',
     outside: 'Someone outside this list', unknown: "I don't know",
@@ -224,7 +251,8 @@ const T = {
 };
 
 let LANG = 'ru', t = T.ru;
-let accessCode = '', OBJECTIVE = null, ROLES = [];
+let accessCode = '', OBJECTIVE = null, ROLES = [], ROLE_OPTS = [], UNITS = [];
+const HZ = ['lt6', '6_12', '1_2y', 'gt2y', 'unknown'];
 let QS = [], current = 0;
 const answers = {};
 
@@ -247,16 +275,36 @@ function loadDraft() {
 }
 function clearDraft() { try { const k = draftKey(); if (k) localStorage.removeItem(k); } catch (e) {} }
 
+function escH(x) {
+  return String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// Список должностей по алфавиту, а не по иерархии: первая строка иначе
+// собирает лишние выборы. «Не знаю» и «вне списка» вынесены в отдельную
+// группу, чтобы их не проскакивали среди должностей.
+function roleOptionsHtml(firstLabel, withOther, exclude) {
+  let h = '<option value="">' + escH(firstLabel || '') + '</option>';
+  const roles = ROLE_OPTS.filter(r => r !== exclude);
+  if (roles.length) {
+    h += '<optgroup label="' + escH(t.grp_roles) + '">'
+       + roles.map(r => '<option value="role:' + escH(r) + '">' + escH(r) + '</option>').join('')
+       + '</optgroup>';
+  }
+  if (withOther) {
+    h += '<optgroup label="' + escH(t.grp_other) + '">'
+       + '<option value="outside">' + escH(t.outside) + '</option>'
+       + '<option value="unknown">' + escH(t.unknown) + '</option></optgroup>';
+  }
+  return h;
+}
+
 function buildQuestions() {
-  const d = OBJECTIVE.deadline ? String(OBJECTIVE.deadline).slice(0, 7) : '';
-  const by = d ? (LANG === 'en' ? ' by ' + d : ' к ' + d) : '';
-  // Должности, а не имена: имён нет ни в одной базе, и на RU их быть не должно.
-  const opts = ROLES.map(r => ({ v: 'role:' + r, t: r }));
-  opts.push({ v: 'outside', t: t.outside });
-  opts.push({ v: 'unknown', t: t.unknown });
+  // Срок из паспорта в первый вопрос не подставляем: он якорит ответ.
+  // Горизонт спрашиваем отдельно, закрытым списком.
+  ROLE_OPTS = ROLES.slice().sort((a, b) => String(a).localeCompare(String(b), LANG));
   QS = [
-    { k: 'task_text', text: t.q1.replace('{d}', by), hint: t.q1h },
-    { k: 'owner',     text: t.q2, hint: t.q2h, choices: opts },
+    { k: 'task_text', text: t.q1, hint: t.q1h, extra: 'horizon' },
+    { k: 'owner',     text: t.q2, hint: t.q2h, choices: true, extra: 'owner2' },
     { k: 'own_part',  text: t.q3, hint: t.q3h },
   ];
 }
@@ -285,6 +333,17 @@ async function enter() {
     el('intro-title').textContent = t.title;
     el('intro-text').textContent = t.intro;
     el('intro-note').textContent = t.note;
+    // Подразделение спрашиваем до вопросов и не считаем вопросом: это разметка
+    // контура, без неё расхождение считается по всей команде скопом.
+    UNITS = (OBJECTIVE && Array.isArray(OBJECTIVE.units)) ? OBJECTIVE.units : [];
+    if (UNITS.length) {
+      el('unit-label').textContent = t.unit;
+      el('unit-sel').innerHTML = '<option value=""></option>'
+        + UNITS.map(u => '<option value="' + escH(u) + '">' + escH(u) + '</option>').join('')
+        + '<option value="other">' + escH(t.unit_other) + '</option>';
+      el('unit-sel').value = answers.unit || '';
+      el('unit-wrap').style.display = 'block';
+    }
     el('finish-title').textContent = t.done;
     el('finish-text').textContent = t.done_text;
     showScreen('screen-intro');
@@ -294,7 +353,20 @@ async function enter() {
   }
 }
 
-function start() { showScreen('screen-q'); render(); }
+function onUnit() {
+  answers.unit = el('unit-sel').value;
+  el('unit-error').style.display = 'none';
+  saveDraft();
+}
+
+function start() {
+  if (UNITS.length && !el('unit-sel').value) {
+    el('unit-error').textContent = t.err_unit;
+    el('unit-error').style.display = 'block';
+    return;
+  }
+  showScreen('screen-q'); render();
+}
 
 function render() {
   const q = QS[current];
@@ -304,14 +376,14 @@ function render() {
   el('q-hint').textContent = q.hint || '';
   const ta = el('q-answer'), sel = el('q-choice');
   if (q.choices) {
-    sel.innerHTML = '<option value=""></option>' +
-      q.choices.map(o => '<option value="' + o.v + '">' + o.t + '</option>').join('');
+    sel.innerHTML = roleOptionsHtml('', true, null);
     sel.value = answers[q.k] || '';
     ta.style.display = 'none'; sel.style.display = 'block'; sel.focus();
   } else {
     sel.style.display = 'none'; ta.style.display = 'block';
     ta.value = answers[q.k] || ''; ta.focus();
   }
+  renderExtra(q);
   el('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
   el('btn-next').textContent = current === QS.length - 1 ? t.submit : t.next;
   el('error-msg').style.display = 'none';
@@ -319,9 +391,35 @@ function render() {
   el('progress-txt').textContent = (current + 1) + ' / ' + QS.length;
 }
 
+function renderExtra(q) {
+  const box = el('q-extra'), sel = el('q-extra-sel');
+  if (q.extra === 'horizon') {
+    el('q-extra-label').textContent = t.q1d;
+    sel.innerHTML = '<option value=""></option>'
+      + t.hz.map((lbl, i) => '<option value="' + HZ[i] + '">' + escH(lbl) + '</option>').join('');
+    sel.value = answers.horizon || '';
+    box.style.display = 'block';
+  } else if (q.extra === 'owner2') {
+    el('q-extra-label').textContent = t.q2b;
+    const main = String(answers.owner || '');
+    sel.innerHTML = roleOptionsHtml(t.q2bnone, false,
+      main.startsWith('role:') ? main.slice(5) : null);
+    sel.value = answers.owner2 || '';
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
 function onInput() {
   const q = QS[current];
   answers[q.k] = q.choices ? el('q-choice').value : el('q-answer').value;
+  if (q.extra === 'horizon') answers.horizon = el('q-extra-sel').value;
+  if (q.extra === 'owner2') {
+    answers.owner2 = el('q-extra-sel').value;
+    // Основной ответ мог смениться — второй список не должен его повторять.
+    if (document.activeElement !== el('q-extra-sel')) renderExtra(q);
+  }
   el('error-msg').style.display = 'none';
   saveDraft();
 }
@@ -334,6 +432,11 @@ function goNext() {
   // «Не знаю» и «ничего не зависит» — полноценные ответы, но пустое поле нет.
   if (!val || (!q.choices && val.length < 2)) {
     el('error-msg').textContent = q.choices ? t.err_choice : t.err_short;
+    el('error-msg').style.display = 'block'; return;
+  }
+  // Срок обязателен: «не знаю» в списке есть, и это ответ, а пустое поле — нет.
+  if (q.extra === 'horizon' && !el('q-extra-sel').value) {
+    el('error-msg').textContent = t.err_horizon;
     el('error-msg').style.display = 'block'; return;
   }
   answers[q.k] = val;
@@ -352,9 +455,13 @@ async function submitForm() {
       body: JSON.stringify({
         code: accessCode,
         answers: {
+          unit: answers.unit || null,
           task_text: answers.task_text || null,
+          horizon: answers.horizon || null,
           owner_choice: choice.startsWith('role:') ? 'role' : (choice || null),
           owner_role: choice.startsWith('role:') ? choice.slice(5) : null,
+          owner_role_2: String(answers.owner2 || '').startsWith('role:')
+            ? String(answers.owner2).slice(5) : null,
           own_part: answers.own_part || null,
         },
       }),
