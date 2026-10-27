@@ -75,6 +75,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
   background:#fff;resize:vertical;line-height:1.6;transition:border .2s}
 .q-input:focus{outline:none;border-color:var(--navy)}
 .q-input.short{min-height:60px}
+.q-goal{margin-bottom:18px}
+.q-goal-text{font-size:15px;color:var(--ink);line-height:1.5;margin-bottom:6px}
+.q-task{margin-bottom:10px}
 .q-nav{display:flex;justify-content:space-between;align-items:center;
   margin-top:24px;padding-top:20px;border-top:1px solid var(--cream-d)}
 .btn-nav{padding:11px 24px;border-radius:8px;font-size:15px;
@@ -165,6 +168,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     <textarea class="q-input" id="q-answer" placeholder="Ваш ответ..."
       oninput="onInput()"></textarea>
     <select class="q-input short" id="q-choice" style="display:none" onchange="onInput()"></select>
+    <div id="q-multi" style="display:none"></div>
     <div id="q-extra" style="display:none">
       <div class="q-hint" id="q-extra-label" style="margin-top:16px"></div>
       <select class="q-input short" id="q-extra-sel" onchange="onInput()"></select>
@@ -337,10 +341,10 @@ const QUESTIONS_BY_LANG = {
 let QUESTIONS = QUESTIONS_BY_LANG.ru;
 
 // ── ЦЕЛЬ ─────────────────────────────────────────────────────────────────────
-// Если у группы есть активный паспорт цели, в конец опросника дописываются три
-// вопроса о ней. Они не часть нарративного статуса: при отправке уходят
-// отдельным полем и в анализ НС не попадают.
-let OBJECTIVE = null, OBJECTIVE_ROLES = [], invitationId = null, draftCurrent = null;
+// Если у группы есть активный паспорт цели, в конец опросника дописываются
+// вопросы о целях компании. Они не часть нарративного статуса: при отправке
+// уходят отдельным полем и в анализ НС не попадают.
+let OBJECTIVE = null, OBJECTIVE_ROLES = [], invitationId = null, draftCurrent = null, GOALS = [];
 const OBJ_PREFIX = 'G';
 
 const HZ = ['lt6', '6_12', '1_2y', 'gt2y', 'unknown'];
@@ -382,64 +386,113 @@ function unitOptionsHtml() {
     + '<option value="other">' + (ru ? 'Другое' : 'Other') + '</option>';
 }
 
+// Порядок (решение 27.10.2026): сначала участник сам называет три задачи
+// компании — вслепую, целей руководства он ещё не видел. Потом видит
+// формулировки целей паспорта (без сроков: срок якорит ответ о горизонте)
+// и называет ответственного за каждую. Срок и «своя часть» — про цель №1.
+// Ключи начинаются с G — по ним ответы отделяются от ответов НС.
 function objectiveQuestions() {
   if (!OBJECTIVE) return [];
   const ru = LANG !== 'en';
-  const block = ru ? '④ Цель' : '④ The objective';
+  const block = ru ? '④ Цели компании' : "④ The company's objectives";
+  GOALS = (Array.isArray(OBJECTIVE.goals) && OBJECTIVE.goals.length)
+    ? OBJECTIVE.goals : [{ rank: 1, statement: OBJECTIVE.statement || '' }];
+  const one = GOALS.length === 1;
+  const lbl = (k) => ru ? 'Цели · вопрос ' + k + ' из 4' : 'Objectives · question ' + k + ' of 4';
   // Подразделение — разметка контура, а не вопрос: номер у шага не выводится.
   const units = (Array.isArray(OBJECTIVE.units) && OBJECTIVE.units.length)
     ? [{ block, n: 'G0', short: true, choices: true, kind: 'units', noNum: true,
          text: ru ? 'Из какого вы подразделения?' : 'Which unit are you in?',
          hint: ru ? 'Выберите из списка.' : 'Choose from the list.' }]
     : [];
-  // Срок из паспорта в первый вопрос не подставляем: он якорит ответ.
-  // Горизонт спрашиваем отдельно, закрытым списком.
   return units.concat([
-    { block, n: 'G1', short: false, extra: 'horizon',
-      text: ru ? 'Своими словами: какую основную задачу компания должна решить?'
-               : 'In your own words: what is the main task the company must solve?',
-      hint: ru ? 'Одно предложение. Не формулировку с совещания, а так, как сказали бы коллеге.'
-               : 'One sentence. Not the wording from a meeting — the way you would tell a colleague.' },
-    { block, n: 'G2', short: true, choices: true, extra: 'owner2',
-      text: ru ? 'Кто в большей степени отвечает за то, чтобы это произошло?'
-               : 'Who is most responsible for making it happen?',
-      hint: ru ? 'Один человек из списка.' : 'One person from the list.' },
-    { block, n: 'G3', short: false,
-      text: ru ? 'Что в этом результате зависит лично от вас?' : 'What in this result depends on you personally?',
+    { block, n: 'G1', kind: 'tasks', label: lbl(1),
+      text: ru ? 'Какие три задачи сейчас стоят перед компанией? Перечислите их по важности: первой — самую важную.'
+               : 'What three tasks does the company face right now? List them in order of importance, the most important first.',
+      hint: ru ? 'Своими словами, по одному предложению на задачу — так, как сказали бы коллеге. Обязательна первая; если других не видите, оставьте поля пустыми.'
+               : 'In your own words, one sentence per task — the way you would tell a colleague. Only the first is required; if you see no others, leave the fields empty.' },
+    { block, n: 'G2', kind: 'owners', label: lbl(2),
+      text: ru ? (one ? 'Руководство компании назвало такую цель. Кто в большей степени отвечает за неё?'
+                      : 'Руководство компании назвало такие цели. Кто в большей степени отвечает за каждую из них?')
+               : (one ? "The company's leadership has named this objective. Who is most responsible for it?"
+                      : "The company's leadership has named these objectives. Who is most responsible for each of them?"),
+      hint: ru ? 'По одному человеку из списка на каждую цель.' : 'One person from the list for each objective.' },
+    { block, n: 'G1h', short: true, choices: true, kind: 'hz', label: lbl(3),
+      text: ru ? (one ? 'К какому сроку, по-вашему, должна быть достигнута эта цель?' : 'К какому сроку, по-вашему, должна быть достигнута цель №1?')
+               : (one ? 'In your view, by when should this objective be achieved?' : 'In your view, by when should objective 1 be achieved?'),
+      hint: (ru ? '«' : '“') + GOALS[0].statement + (ru ? '»' : '”') },
+    { block, n: 'G3', short: false, label: lbl(4),
+      text: ru ? (one ? 'Что в достижении этой цели зависит лично от вас?' : 'Что в достижении цели №1 зависит лично от вас?')
+               : (one ? 'What in achieving this objective depends on you personally?' : 'What in achieving objective 1 depends on you personally?'),
       hint: ru ? 'Одно-два предложения. Если считаете, что не зависит ничего — так и напишите.'
                : "One or two sentences. If you think nothing does — write that." },
   ]);
 }
 
-function renderExtra(q) {
-  const box = document.getElementById('q-extra');
-  const sel = document.getElementById('q-extra-sel');
-  const lab = document.getElementById('q-extra-label');
+// Три поля задач: значения в answers.G1 по порядку.
+function tasksHtml() {
   const ru = LANG !== 'en';
-  if (q.extra === 'horizon') {
-    lab.textContent = ru ? 'К какому сроку?' : 'By when?';
-    const labels = HZ_LBL[ru ? 'ru' : 'en'];
-    sel.innerHTML = '<option value=""></option>'
-      + labels.map((l, i) => '<option value="' + HZ[i] + '">' + escH(l) + '</option>').join('');
-    sel.value = answers.G1h || '';
-    box.style.display = 'block';
-  } else if (q.extra === 'owner2') {
-    lab.textContent = ru ? 'Если ответственность реально разделена — кто ещё? (необязательно)'
-                         : 'If responsibility is genuinely shared — who else? (optional)';
-    const main = String(answers.G2 || '');
-    sel.innerHTML = roleOptionsHtml(ru ? 'Нет, не разделена' : 'No, not shared', false,
-      main.startsWith('role:') ? main.slice(5) : null);
-    sel.value = answers.G2b || '';
-    box.style.display = 'block';
-  } else {
-    box.style.display = 'none';
+  const ph = ru ? ['Самая важная задача', 'Вторая (необязательно)', 'Третья (необязательно)']
+                : ['The most important task', 'Second (optional)', 'Third (optional)'];
+  const v = Array.isArray(answers.G1) ? answers.G1 : [];
+  return [0, 1, 2].map(i =>
+    '<div class="q-task"><textarea class="q-input short g-task" rows="2" placeholder="' + escH((i + 1) + '. ' + ph[i]) +
+    '" oninput="onInput()">' + escH(v[i] || '') + '</textarea></div>').join('');
+}
+
+// Цели паспорта и ответственный за каждую; у цели №1 — второй, если разделено.
+function ownersHtml() {
+  const ru = LANG !== 'en';
+  const one = GOALS.length === 1;
+  return GOALS.map(g => {
+    let h = '<div class="q-goal">'
+      + '<div class="q-goal-text">' + (one ? '' : '<b>' + (ru ? 'Цель №' + g.rank : 'Objective ' + g.rank) + '.</b> ') + escH(g.statement) + '</div>'
+      + '<select class="q-input short g-owner" data-rank="' + g.rank + '" onchange="onOwner(this)">' + roleOptionsHtml('', true, null) + '</select>';
+    if (g.rank === 1) {
+      h += '<div class="q-hint" style="margin:10px 0 6px">'
+        + (ru ? 'Если ответственность реально разделена — кто ещё? (необязательно)' : 'If responsibility is genuinely shared — who else? (optional)')
+        + '</div><select class="q-input short g-owner2" onchange="onInput()"></select>';
+    }
+    return h + '</div>';
+  }).join('');
+}
+
+function fillOwner2() {
+  const s2 = document.querySelector('#q-multi .g-owner2'); if (!s2) return;
+  const main = String((answers.G2 || {})[1] || '');
+  const keep = answers.G2b || '';
+  s2.innerHTML = roleOptionsHtml(LANG === 'en' ? 'No, not shared' : 'Нет, не разделена', false,
+    main.startsWith('role:') ? main.slice(5) : null);
+  s2.value = keep;
+  if (s2.value !== keep) answers.G2b = '';
+}
+
+function onOwner(selEl) {
+  onInput();
+  // Основной ответ по цели №1 сменился — второй список не должен его повторять.
+  if (selEl.dataset.rank === '1') fillOwner2();
+}
+
+function readMulti(q) {
+  const m = document.getElementById('q-multi');
+  if (q.kind === 'tasks') answers.G1 = Array.from(m.querySelectorAll('.g-task')).map(x => x.value);
+  if (q.kind === 'owners') {
+    const o = {};
+    m.querySelectorAll('.g-owner').forEach(x => { if (x.value) o[x.dataset.rank] = x.value; });
+    answers.G2 = o;
+    const s2 = m.querySelector('.g-owner2'); if (s2) answers.G2b = s2.value;
   }
 }
+
+const isMulti = (q) => q.kind === 'tasks' || q.kind === 'owners';
 
 function applyObjective() {
   const extra = objectiveQuestions();
   if (!extra.length) return;
   QUESTIONS = QUESTIONS.concat(extra);
+  // Черновик прежнего блока (одна задача, один ответственный) — переносим.
+  if (typeof answers.G1 === 'string') answers.G1 = [answers.G1];
+  if (typeof answers.G2 === 'string') answers.G2 = answers.G2 ? { 1: answers.G2 } : {};
   if (draftCurrent !== null) current = Math.min(draftCurrent, QUESTIONS.length - 1);
 }
 
@@ -530,8 +583,8 @@ async function verifyCode() {
       if (OBJECTIVE) {
         const it = document.getElementById('intro-text');
         if (it) it.innerHTML += (LANG === 'en')
-          ? '<br><br>At the end — three short questions about the goal your company has set.'
-          : '<br><br>В конце — три коротких вопроса о цели, которую поставила ваша компания.';
+          ? "<br><br>At the end — four short questions about your company's objectives."
+          : '<br><br>В конце — четыре коротких вопроса о целях, которые поставила ваша компания.';
       }
       const name = data.invitedName ? data.invitedName.split(' ')[0] : '';
       document.getElementById('intro-title').textContent =
@@ -712,7 +765,7 @@ async function startForm() {
 function renderQuestion() {
   const q = QUESTIONS[current];
   document.getElementById('q-block').textContent = q.block;
-  document.getElementById('q-num').textContent = q.noNum ? '' : UI().q_num.replace('{n}', q.n);
+  document.getElementById('q-num').textContent = q.noNum ? '' : (q.label || UI().q_num.replace('{n}', q.n));
   document.getElementById('q-text').textContent = q.text;
   const hint = document.getElementById('q-hint');
   hint.textContent = q.hint || '';
@@ -720,8 +773,23 @@ function renderQuestion() {
 
   const ta = document.getElementById('q-answer');
   const sel = document.getElementById('q-choice');
-  if (q.choices) {
-    sel.innerHTML = q.kind === 'units' ? unitOptionsHtml() : roleOptionsHtml('', true, null);
+  const multi = document.getElementById('q-multi');
+  multi.style.display = 'none';
+  if (isMulti(q)) {
+    ta.style.display = 'none'; sel.style.display = 'none';
+    multi.innerHTML = q.kind === 'tasks' ? tasksHtml() : ownersHtml();
+    multi.style.display = 'block';
+    if (q.kind === 'owners') {
+      const v = answers.G2 || {};
+      multi.querySelectorAll('.g-owner').forEach(x => { x.value = v[x.dataset.rank] || ''; });
+      fillOwner2();
+    }
+    const first = multi.querySelector('textarea, select'); if (first) first.focus();
+  } else if (q.choices) {
+    const ru = LANG !== 'en';
+    sel.innerHTML = q.kind === 'units' ? unitOptionsHtml()
+      : q.kind === 'hz' ? '<option value=""></option>' + HZ_LBL[ru ? 'ru' : 'en'].map((l, i) => '<option value="' + HZ[i] + '">' + escH(l) + '</option>').join('')
+      : roleOptionsHtml('', true, null);
     sel.value = answers[q.n] || '';
     ta.style.display = 'none'; sel.style.display = 'block'; sel.focus();
   } else {
@@ -731,8 +799,6 @@ function renderQuestion() {
     if (q.prefix && !ta.value) ta.value = q.prefix;
     ta.focus();
   }
-
-  renderExtra(q);
 
   document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
   document.getElementById('btn-next').textContent = current === QUESTIONS.length - 1 ? UI().btn_submit : UI().btn_next;
@@ -746,21 +812,16 @@ function onInput() {
   document.getElementById('error-msg').style.display = 'none';
   // Черновик пишем на каждом вводе: даже незаконченный ответ не пропадёт.
   const qi = QUESTIONS[current];
-  answers[qi.n] = qi.choices
+  if (isMulti(qi)) readMulti(qi);
+  else answers[qi.n] = qi.choices
     ? document.getElementById('q-choice').value
     : document.getElementById('q-answer').value;
-  if (qi.extra === 'horizon') answers.G1h = document.getElementById('q-extra-sel').value;
-  if (qi.extra === 'owner2') {
-    answers.G2b = document.getElementById('q-extra-sel').value;
-    // Основной ответ мог смениться — второй список не должен его повторять.
-    if (document.activeElement !== document.getElementById('q-extra-sel')) renderExtra(qi);
-  }
   saveDraft();
 }
 
 function updateCharCount() {
   const q = QUESTIONS[current];
-  if (q.choices) { document.getElementById('char-count').textContent = ''; return; }
+  if (q.choices || isMulti(q)) { document.getElementById('char-count').textContent = ''; return; }
   const val = document.getElementById('q-answer').value.trim();
   const prefix = q.prefix || '';
   const actual = val.startsWith(prefix) ? val.slice(prefix.length) : val;
@@ -777,9 +838,28 @@ function goBack() { if (current > 0) { current--; renderQuestion(); } }
 
 function goNext() {
   const q = QUESTIONS[current];
+  const ru = LANG !== 'en';
+  const em = document.getElementById('error-msg');
+  const fail = (msg) => { if (msg) em.textContent = msg; em.style.display = 'block'; };
+  if (isMulti(q)) {
+    readMulti(q);
+    if (q.kind === 'tasks' && String((answers.G1 || [])[0] || '').trim().length < 2) {
+      return fail(ru ? 'Пожалуйста, назовите хотя бы одну задачу' : 'Please name at least one task');
+    }
+    // «Не знаю» — полноценный ответ, а пустой выбор нет.
+    if (q.kind === 'owners' && GOALS.some(g => !(answers.G2 || {})[g.rank])) {
+      return fail(ru ? 'Пожалуйста, выберите ответственного для каждой цели' : 'Please choose who is responsible for each objective');
+    }
+    if (current < QUESTIONS.length - 1) { current++; saveDraft(); renderQuestion(); }
+    else { saveDraft(); submitForm(); }
+    return;
+  }
   if (q.choices) {
     const chosen = document.getElementById('q-choice').value;
-    if (!chosen) { document.getElementById('error-msg').style.display = 'block'; return; }
+    if (!chosen) {
+      return fail(q.kind === 'hz' ? (ru ? 'Пожалуйста, выберите срок' : 'Please choose a timeframe')
+        : (ru ? 'Пожалуйста, выберите вариант' : 'Please choose an option'));
+    }
     answers[q.n] = chosen;
     if (current < QUESTIONS.length - 1) { current++; saveDraft(); renderQuestion(); }
     else { saveDraft(); submitForm(); }
@@ -788,13 +868,7 @@ function goNext() {
   const val = document.getElementById('q-answer').value.trim();
   const prefix = q.prefix || '';
   const actual = val.startsWith(prefix) ? val.slice(prefix.length).trim() : val;
-  if (actual.length < 2) { document.getElementById('error-msg').style.display = 'block'; return; }
-  // Срок обязателен: «не знаю» в списке есть, и это ответ, а пустое поле — нет.
-  if (q.extra === 'horizon' && !document.getElementById('q-extra-sel').value) {
-    const em = document.getElementById('error-msg');
-    em.textContent = LANG === 'en' ? 'Please choose a timeframe' : 'Пожалуйста, выберите срок';
-    em.style.display = 'block'; return;
-  }
+  if (actual.length < 2) { em.textContent = UI().error_min; em.style.display = 'block'; return; }
   answers[q.n] = val;
   if (current < QUESTIONS.length - 1) { current++; saveDraft(); renderQuestion(); }
   else { saveDraft(); submitForm(); }
@@ -819,14 +893,20 @@ async function submitForm() {
       language: LANG, // подсказка; язык сервер всё равно берёт из кода
     };
     if (OBJECTIVE && (obj.G0 || obj.G1 || obj.G2 || obj.G3)) {
-      const choice = String(obj.G2 || '');
+      // Выбор из списка ('role:Должность' | 'outside' | 'unknown') → поля ответа.
+      const pick = (v) => { v = String(v || ''); return v.startsWith('role:') ? { choice: 'role', role: v.slice(5) } : { choice: v || null, role: null }; };
+      const tasks = (Array.isArray(obj.G1) ? obj.G1 : [obj.G1]).map(x => String(x || '').trim()).filter(Boolean);
+      const owners = (obj.G2 && typeof obj.G2 === 'object') ? obj.G2 : {};
+      const first = pick(owners[1]);
       body.invitation_id = invitationId;
       body.objective_answers = {
         unit: obj.G0 || null,
-        task_text: obj.G1 || null,
+        tasks,
+        task_text: tasks[0] || null,
+        goal_owners: GOALS.filter(g => owners[g.rank]).map(g => ({ rank: g.rank, ...pick(owners[g.rank]) })),
         horizon: obj.G1h || null,
-        owner_choice: choice.startsWith('role:') ? 'role' : (choice || null),
-        owner_role: choice.startsWith('role:') ? choice.slice(5) : null,
+        owner_choice: first.choice,
+        owner_role: first.role,
         owner_role_2: String(obj.G2b || '').startsWith('role:')
           ? String(obj.G2b).slice(5) : null,
         own_part: obj.G3 || null,
