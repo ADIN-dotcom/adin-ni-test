@@ -412,11 +412,12 @@ function objectiveQuestions() {
       hint: ru ? 'Своими словами, по одному предложению на задачу — так, как сказали бы коллеге. Обязательна первая; если других не видите, оставьте поля пустыми.'
                : 'In your own words, one sentence per task — the way you would tell a colleague. Only the first is required; if you see no others, leave the fields empty.' },
     { block, n: 'G2', kind: 'owners', label: lbl(2),
-      text: ru ? (one ? 'Руководство компании назвало такую цель. Кто в большей степени отвечает за неё?'
-                      : 'Руководство компании назвало такие цели. Кто в большей степени отвечает за каждую из них?')
-               : (one ? "The company's leadership has named this objective. Who is most responsible for it?"
-                      : "The company's leadership has named these objectives. Who is most responsible for each of them?"),
-      hint: ru ? 'По одному человеку из списка на каждую цель.' : 'One person from the list for each objective.' },
+      text: ru ? (one ? 'Руководство компании назвало такую цель. Кто, на ваш взгляд, главный ответственный за неё?'
+                      : 'Руководство компании назвало такие цели. Кто, на ваш взгляд, главный ответственный за каждую из них?')
+               : (one ? "The company's leadership has named this objective. Who, in your view, is the main person responsible for it?"
+                      : "The company's leadership has named these objectives. Who, in your view, is the main person responsible for each of them?"),
+      hint: ru ? 'Один человек из списка на каждую цель. Если отвечает ещё кто-то — укажите ниже.'
+               : 'One person from the list for each objective. If someone else is also responsible, add them below.' },
     { block, n: 'G1h', short: true, choices: true, kind: 'hz', label: lbl(3),
       text: ru ? (one ? 'К какому сроку, по-вашему, должна быть достигнута эта цель?' : 'К какому сроку, по-вашему, должна быть достигнута цель №1?')
                : (one ? 'In your view, by when should this objective be achieved?' : 'In your view, by when should objective 1 be achieved?'),
@@ -440,37 +441,35 @@ function tasksHtml() {
     '" oninput="onInput()">' + escH(v[i] || '') + '</textarea></div>').join('');
 }
 
-// Цели паспорта и ответственный за каждую; у цели №1 — второй, если разделено.
+// Цели паспорта, главный ответственный за каждую и второй, если отвечает
+// ещё кто-то, — у каждой цели. answers.G2b — {rank: выбор}.
 function ownersHtml() {
   const ru = LANG !== 'en';
   const one = GOALS.length === 1;
-  return GOALS.map(g => {
-    let h = '<div class="q-goal">'
-      + '<div class="q-goal-text">' + (one ? '' : '<b>' + (ru ? 'Цель №' + g.rank : 'Objective ' + g.rank) + '.</b> ') + escH(g.statement) + '</div>'
-      + '<select class="q-input short g-owner" data-rank="' + g.rank + '" onchange="onOwner(this)">' + roleOptionsHtml('', true, null) + '</select>';
-    if (g.rank === 1) {
-      h += '<div class="q-hint" style="margin:10px 0 6px">'
-        + (ru ? 'Если ответственность реально разделена — кто ещё? (необязательно)' : 'If responsibility is genuinely shared — who else? (optional)')
-        + '</div><select class="q-input short g-owner2" onchange="onInput()"></select>';
-    }
-    return h + '</div>';
-  }).join('');
+  return GOALS.map(g => '<div class="q-goal">'
+    + '<div class="q-goal-text">' + (one ? '' : '<b>' + (ru ? 'Цель №' + g.rank : 'Objective ' + g.rank) + '.</b> ') + escH(g.statement) + '</div>'
+    + '<select class="q-input short g-owner" data-rank="' + g.rank + '" onchange="onOwner(this)">' + roleOptionsHtml('', true, null) + '</select>'
+    + '<div class="q-hint" style="margin:10px 0 6px">'
+    + (ru ? 'Кто ещё отвечает за эту цель? (необязательно)' : 'Who else is responsible for this objective? (optional)')
+    + '</div><select class="q-input short g-owner2" data-rank="' + g.rank + '" onchange="onInput()"></select>'
+    + '</div>').join('');
 }
 
-function fillOwner2() {
-  const s2 = document.querySelector('#q-multi .g-owner2'); if (!s2) return;
-  const main = String((answers.G2 || {})[1] || '');
-  const keep = answers.G2b || '';
-  s2.innerHTML = roleOptionsHtml(LANG === 'en' ? 'No, not shared' : 'Нет, не разделена', false,
+function fillOwner2(rank) {
+  const s2 = document.querySelector('#q-multi .g-owner2[data-rank="' + rank + '"]'); if (!s2) return;
+  const main = String((answers.G2 || {})[rank] || '');
+  if (!answers.G2b || typeof answers.G2b !== 'object') answers.G2b = {};
+  const keep = answers.G2b[rank] || '';
+  s2.innerHTML = roleOptionsHtml(LANG === 'en' ? 'No one else' : 'Больше никто', false,
     main.startsWith('role:') ? main.slice(5) : null);
   s2.value = keep;
-  if (s2.value !== keep) answers.G2b = '';
+  if (s2.value !== keep) answers.G2b[rank] = '';
 }
 
 function onOwner(selEl) {
   onInput();
-  // Основной ответ по цели №1 сменился — второй список не должен его повторять.
-  if (selEl.dataset.rank === '1') fillOwner2();
+  // Главный ответственный сменился — второй список не должен его повторять.
+  fillOwner2(selEl.dataset.rank);
 }
 
 function readMulti(q) {
@@ -480,7 +479,9 @@ function readMulti(q) {
     const o = {};
     m.querySelectorAll('.g-owner').forEach(x => { if (x.value) o[x.dataset.rank] = x.value; });
     answers.G2 = o;
-    const s2 = m.querySelector('.g-owner2'); if (s2) answers.G2b = s2.value;
+    const o2 = {};
+    m.querySelectorAll('.g-owner2').forEach(x => { if (x.value) o2[x.dataset.rank] = x.value; });
+    answers.G2b = o2;
   }
 }
 
@@ -493,6 +494,8 @@ function applyObjective() {
   // Черновик прежнего блока (одна задача, один ответственный) — переносим.
   if (typeof answers.G1 === 'string') answers.G1 = [answers.G1];
   if (typeof answers.G2 === 'string') answers.G2 = answers.G2 ? { 1: answers.G2 } : {};
+  // Второй ответственный был только у цели №1 — строкой.
+  if (typeof answers.G2b === 'string') answers.G2b = answers.G2b ? { 1: answers.G2b } : {};
   if (draftCurrent !== null) current = Math.min(draftCurrent, QUESTIONS.length - 1);
 }
 
@@ -782,7 +785,7 @@ function renderQuestion() {
     if (q.kind === 'owners') {
       const v = answers.G2 || {};
       multi.querySelectorAll('.g-owner').forEach(x => { x.value = v[x.dataset.rank] || ''; });
-      fillOwner2();
+      GOALS.forEach(g => fillOwner2(g.rank));
     }
     const first = multi.querySelector('textarea, select'); if (first) first.focus();
   } else if (q.choices) {
@@ -898,17 +901,19 @@ async function submitForm() {
       const tasks = (Array.isArray(obj.G1) ? obj.G1 : [obj.G1]).map(x => String(x || '').trim()).filter(Boolean);
       const owners = (obj.G2 && typeof obj.G2 === 'object') ? obj.G2 : {};
       const first = pick(owners[1]);
+      const owners2 = (obj.G2b && typeof obj.G2b === 'object') ? obj.G2b : { 1: obj.G2b };
+      const role2 = (v) => String(v || '').startsWith('role:') ? String(v).slice(5) : null;
       body.invitation_id = invitationId;
       body.objective_answers = {
         unit: obj.G0 || null,
         tasks,
         task_text: tasks[0] || null,
-        goal_owners: GOALS.filter(g => owners[g.rank]).map(g => ({ rank: g.rank, ...pick(owners[g.rank]) })),
+        goal_owners: GOALS.filter(g => owners[g.rank])
+          .map(g => ({ rank: g.rank, ...pick(owners[g.rank]), role_2: role2(owners2[g.rank]) })),
         horizon: obj.G1h || null,
         owner_choice: first.choice,
         owner_role: first.role,
-        owner_role_2: String(obj.G2b || '').startsWith('role:')
-          ? String(obj.G2b).slice(5) : null,
+        owner_role_2: role2(owners2[1]),
         own_part: obj.G3 || null,
       };
     }
