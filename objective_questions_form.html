@@ -199,15 +199,15 @@ const T = {
     q1: 'Какие три задачи сейчас стоят перед компанией? Перечислите их по важности: первой — самую важную.',
     q1h: 'Своими словами, по одному предложению на задачу — так, как сказали бы коллеге. Обязательна первая; если других не видите, оставьте поля пустыми.',
     task_ph: ['Самая важная задача', 'Вторая (необязательно)', 'Третья (необязательно)'],
-    q2: 'Руководство компании назвало такие цели. Кто в большей степени отвечает за каждую из них?',
-    q2one: 'Руководство компании назвало такую цель. Кто в большей степени отвечает за неё?',
-    q2h: 'По одному человеку из списка на каждую цель.',
+    q2: 'Руководство компании назвало такие цели. Кто, на ваш взгляд, главный ответственный за каждую из них?',
+    q2one: 'Руководство компании назвало такую цель. Кто, на ваш взгляд, главный ответственный за неё?',
+    q2h: 'Один человек из списка на каждую цель. Если отвечает ещё кто-то — укажите ниже.',
     goal_n: 'Цель №{n}',
     q3: 'К какому сроку, по-вашему, должна быть достигнута цель №1?',
     q3one: 'К какому сроку, по-вашему, должна быть достигнута эта цель?',
     hz: ['до 6 месяцев', '6–12 месяцев', '1–2 года', 'больше 2 лет', 'не знаю'],
-    q2b: 'Если ответственность реально разделена — кто ещё? (необязательно)',
-    q2bnone: 'Нет, не разделена',
+    q2b: 'Кто ещё отвечает за эту цель? (необязательно)',
+    q2bnone: 'Больше никто',
     grp_roles: 'Должности', grp_other: 'Другое',
     unit: 'Из какого вы подразделения?',
     unit_other: 'Другое',
@@ -237,15 +237,15 @@ const T = {
     q1: 'What three tasks does the company face right now? List them in order of importance, the most important first.',
     q1h: 'In your own words, one sentence per task — the way you would tell a colleague. Only the first is required; if you see no others, leave the fields empty.',
     task_ph: ['The most important task', 'Second (optional)', 'Third (optional)'],
-    q2: "The company's leadership has named these objectives. Who is most responsible for each of them?",
-    q2one: "The company's leadership has named this objective. Who is most responsible for it?",
-    q2h: 'One person from the list for each objective.',
+    q2: "The company's leadership has named these objectives. Who, in your view, is the main person responsible for each of them?",
+    q2one: "The company's leadership has named this objective. Who, in your view, is the main person responsible for it?",
+    q2h: 'One person from the list for each objective. If someone else is also responsible, add them below.',
     goal_n: 'Objective {n}',
     q3: 'In your view, by when should objective 1 be achieved?',
     q3one: 'In your view, by when should this objective be achieved?',
     hz: ['under 6 months', '6–12 months', '1–2 years', 'more than 2 years', "I don't know"],
-    q2b: 'If responsibility is genuinely shared — who else? (optional)',
-    q2bnone: 'No, not shared',
+    q2b: 'Who else is responsible for this objective? (optional)',
+    q2bnone: 'No one else',
     grp_roles: 'Positions', grp_other: 'Other',
     unit: 'Which unit are you in?',
     unit_other: 'Other',
@@ -292,6 +292,8 @@ function loadDraft() {
     // Черновик прежней формы (одна задача, один ответственный) — переносим.
     if (!answers.tasks && answers.task_text) answers.tasks = [answers.task_text];
     if (!answers.owners && answers.owner) answers.owners = { 1: answers.owner };
+    // Второй ответственный был только у цели №1 — переносим в общий вид.
+    if (!answers.owners2 && answers.owner2) answers.owners2 = { 1: answers.owner2 };
   } catch (e) {}
 }
 function clearDraft() { try { const k = draftKey(); if (k) localStorage.removeItem(k); } catch (e) {} }
@@ -428,7 +430,7 @@ function render() {
   if (q.kind === 'owners') {
     const v = answers.owners || {};
     document.querySelectorAll('#q-multi .g-owner').forEach(x => { x.value = v[x.dataset.rank] || ''; });
-    fillOwner2();
+    GOALS.forEach(g => fillOwner2(g.rank));
   }
   el('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
   el('btn-next').textContent = current === QS.length - 1 ? t.submit : t.next;
@@ -445,35 +447,32 @@ function tasksHtml() {
     '" oninput="onInput()">' + escH(v[i] || '') + '</textarea></div>').join('');
 }
 
-// Цели паспорта и ответственный за каждую; у цели №1 — второй, если разделено.
+// Цели паспорта, главный ответственный за каждую и второй, если отвечает
+// ещё кто-то, — у каждой цели, как в паспорте у соисполнителей.
 function ownersHtml() {
-  const v = answers.owners || {};
   const one = GOALS.length === 1;
-  return GOALS.map(g => {
-    let h = '<div class="q-goal">'
-      + '<div class="q-goal-text">' + (one ? '' : '<b>' + escH(t.goal_n.replace('{n}', g.rank)) + '.</b> ') + escH(g.statement) + '</div>'
-      + '<select class="q-input short g-owner" data-rank="' + g.rank + '" onchange="onOwner(this)">' + roleOptionsHtml('', true, null) + '</select>';
-    if (g.rank === 1) {
-      h += '<div class="q-hint" style="margin:10px 0 6px">' + escH(t.q2b) + '</div>'
-        + '<select class="q-input short g-owner2" onchange="onInput()"></select>';
-    }
-    return h + '</div>';
-  }).join('');
+  return GOALS.map(g => '<div class="q-goal">'
+    + '<div class="q-goal-text">' + (one ? '' : '<b>' + escH(t.goal_n.replace('{n}', g.rank)) + '.</b> ') + escH(g.statement) + '</div>'
+    + '<select class="q-input short g-owner" data-rank="' + g.rank + '" onchange="onOwner(this)">' + roleOptionsHtml('', true, null) + '</select>'
+    + '<div class="q-hint" style="margin:10px 0 6px">' + escH(t.q2b) + '</div>'
+    + '<select class="q-input short g-owner2" data-rank="' + g.rank + '" onchange="onInput()"></select>'
+    + '</div>').join('');
 }
 
-function fillOwner2() {
-  const s2 = document.querySelector('#q-multi .g-owner2'); if (!s2) return;
-  const main = String((answers.owners || {})[1] || '');
-  const keep = answers.owner2 || '';
+function fillOwner2(rank) {
+  const s2 = document.querySelector('#q-multi .g-owner2[data-rank="' + rank + '"]'); if (!s2) return;
+  const main = String((answers.owners || {})[rank] || '');
+  const o2 = answers.owners2 || (answers.owners2 = {});
+  const keep = o2[rank] || '';
   s2.innerHTML = roleOptionsHtml(t.q2bnone, false, main.startsWith('role:') ? main.slice(5) : null);
   s2.value = keep;
-  if (s2.value !== keep) answers.owner2 = '';
+  if (s2.value !== keep) o2[rank] = '';
 }
 
 function onOwner(selEl) {
   onInput();
-  // Основной ответ по цели №1 сменился — второй список не должен его повторять.
-  if (selEl.dataset.rank === '1') fillOwner2();
+  // Главный ответственный сменился — второй список не должен его повторять.
+  fillOwner2(selEl.dataset.rank);
 }
 
 function readMulti(q) {
@@ -483,7 +482,9 @@ function readMulti(q) {
     const o = {};
     m.querySelectorAll('.g-owner').forEach(x => { if (x.value) o[x.dataset.rank] = x.value; });
     answers.owners = o;
-    const s2 = m.querySelector('.g-owner2'); if (s2) answers.owner2 = s2.value;
+    const o2 = {};
+    m.querySelectorAll('.g-owner2').forEach(x => { if (x.value) o2[x.dataset.rank] = x.value; });
+    answers.owners2 = o2;
   }
 }
 
@@ -517,6 +518,9 @@ function goNext() {
   if (current < QS.length - 1) { current++; render(); } else { submitForm(); }
 }
 
+// Второй ответственный — только должность из списка.
+const role2Of = (v) => String(v || '').startsWith('role:') ? String(v).slice(5) : null;
+
 // Выбор из списка ('role:Должность' | 'outside' | 'unknown') → поля ответа.
 function ownerPick(v) {
   v = String(v || '');
@@ -529,6 +533,7 @@ async function submitForm() {
   try {
     const tasks = (answers.tasks || []).map(x => String(x || '').trim()).filter(Boolean);
     const owners = answers.owners || {};
+    const owners2 = answers.owners2 || {};
     const first = ownerPick(owners[1]);
     const r = await fetch(API + '/objectives/submit', {
       method: 'POST',
@@ -539,12 +544,12 @@ async function submitForm() {
           unit: answers.unit || null,
           tasks,
           task_text: tasks[0] || null,
-          goal_owners: GOALS.filter(g => owners[g.rank]).map(g => ({ rank: g.rank, ...ownerPick(owners[g.rank]) })),
+          goal_owners: GOALS.filter(g => owners[g.rank])
+            .map(g => ({ rank: g.rank, ...ownerPick(owners[g.rank]), role_2: role2Of(owners2[g.rank]) })),
           horizon: answers.horizon || null,
           owner_choice: first.choice,
           owner_role: first.role,
-          owner_role_2: String(answers.owner2 || '').startsWith('role:')
-            ? String(answers.owner2).slice(5) : null,
+          owner_role_2: role2Of(owners2[1]),
           own_part: answers.own_part || null,
         },
       }),
