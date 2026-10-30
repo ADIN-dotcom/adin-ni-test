@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test d&#39;intelligence narrative · ADIN</title>
+<title>Тест нарративного интеллекта · ADIN</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -182,18 +182,18 @@ p{color:var(--ink-soft);font-size:15px}
       Sensibilité · Mentalité · Activité</div>
   </div>
   <div class="card" style="max-width:480px;text-align:center">
-    <div class="label">Test d&#39;intelligence narrative</div>
-    <h1 style="margin-bottom:20px">Bienvenue</h1>
-    <p style="margin-bottom:24px">Saisissez votre code d&#39;accès.</p>
+    <div class="label">Тест нарративного интеллекта</div>
+    <h1 style="margin-bottom:20px">Добро пожаловать</h1>
+    <p style="margin-bottom:24px">Введите код доступа из письма-приглашения.</p>
     <div class="field">
       <input id="inp-code" type="text" maxlength="9" placeholder="XXXX-XXXX"
         autocomplete="off" autocapitalize="characters" spellcheck="false"
         oninput="fmtCode(this)" onkeydown="if(event.key==='Enter')checkCode()">
-      <div id="code-err" class="errmsg">Code incorrect. Vérifiez votre invitation et réessayez.</div>
+      <div id="code-err" class="errmsg">Неверный код. Проверьте приглашение и попробуйте ещё раз.</div>
     </div>
-    <button class="btn btn-primary btn-lg btn-full" onclick="checkCode()">Commencer →</button>
+    <button class="btn btn-primary btn-lg btn-full" onclick="checkCode()">Начать →</button>
     <p style="margin-top:20px;font-size:12px;color:var(--ink-faint)">
-      Pas de code ? Contactez l&#39;organisateur.</p>
+      Нет кода? Обратитесь к организатору.</p>
   </div>
 </div>
 
@@ -391,7 +391,7 @@ p{color:var(--ink-soft);font-size:15px}
     <p style="margin-bottom:8px" id="thanks-sub1">Спасибо за участие!</p>
     <p id="thanks-sub2">Ваш краткий результат — ниже.</p>
     <div id="thanks-report" style="text-align:left;margin:8px auto 24px"></div>
-    <button class="btn btn-primary btn-lg" style="margin-bottom:20px" onclick="downloadReportPdf()">Скачать PDF-отчёт</button>
+    <button class="btn btn-primary btn-lg" style="margin-bottom:20px" onclick="downloadReportPdf()" id="btn-pdf">Скачать PDF-отчёт</button>
     <div class="thank-box">
       <h3 id="thanks-next-title">Что дальше?</h3>
       <p id="thanks-next-text">Более подробное объяснение результатов и персональные рекомендации
@@ -468,6 +468,10 @@ const CONTENT = {
       btn_retry: "Попробовать ещё раз",
       error_retry_suffix: " Ваши ответы сохранены. Попробуйте отправить ещё раз.",
       btn_checking: "Проверяем...",
+      btn_code_start: "Начать →",
+      code_enter: "Введите код доступа.",
+      btn_pdf: "Скачать PDF-отчёт",
+      page_title: "Тест нарративного интеллекта · ADIN",
       code_not_found: "Код не найден. Проверьте правильность ввода.",
       code_used: "Этот код уже был использован.",
       code_wrong_test: "Этот код выдан для другого теста. Проверьте письмо.",
@@ -609,6 +613,10 @@ const CONTENT = {
       btn_retry: "Try again",
       error_retry_suffix: " Your answers have been saved. Please try sending them again.",
       btn_checking: "Checking...",
+      btn_code_start: "Start →",
+      code_enter: "Enter your access code.",
+      btn_pdf: "Download PDF report",
+      page_title: "Narrative Intelligence Test · ADIN",
       code_not_found: "Code not found. Please check that you typed it correctly.",
       code_used: "This code has already been used.",
       code_wrong_test: "This code was issued for a different test. Please check your email.",
@@ -850,6 +858,8 @@ function applyLanguage(lang) {
   $('err-msg').textContent = ui.error_default;
   $('error-info').textContent = ui.error_info;
   $('btn-retry').textContent = ui.btn_retry;
+  $('btn-pdf').textContent = ui.btn_pdf;
+  document.title = ui.page_title;
 }
 
 // Первая отрисовка — RU по умолчанию, до того как язык участника
@@ -883,7 +893,7 @@ async function checkCode() {
   errEl.textContent = '';
 
   if (raw.length < 4) {
-    errEl.textContent = 'Saisissez votre code d&#39;accès.';
+    errEl.textContent = UI().code_enter;
     errEl.classList.add('on');
     return;
   }
@@ -913,7 +923,7 @@ async function checkCode() {
       };
       errEl.textContent = msgs[d.reason] || ui.code_invalid;
       errEl.classList.add('on');
-      if (btn) { btn.disabled = false; btn.textContent = 'Commencer →'; }
+      if (btn) { btn.disabled = false; btn.textContent = UI().btn_code_start; }
       return;
     }
 
@@ -937,7 +947,7 @@ async function checkCode() {
   } catch(e) {
     errEl.textContent = UI().code_conn_error;
     errEl.classList.add('on');
-    if (btn) { btn.disabled = false; btn.textContent = 'Commencer →'; }
+    if (btn) { btn.disabled = false; btn.textContent = UI().btn_code_start; }
   }
 }
 
