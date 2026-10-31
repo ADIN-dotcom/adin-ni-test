@@ -550,6 +550,22 @@ function loadDraft() {
 }
 function clearDraft() { try { const k = draftKey(); if (k) localStorage.removeItem(k); } catch (e) {} }
 
+// Участник указан в паспорте целей ответственным или «кто ещё отвечает»
+// (owner_notice из /test/verify-code): до прохождения он должен знать, что
+// его профиль войдёт в отчёт об исполнимости, который видит заказчик
+// (docs/FEASIBILITY_REPORT.md в бэкенде, решение 4).
+function ownerNoticeHtml(list, lang) {
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const en = lang === 'en';
+  const items = list.map(n => (en
+    ? (n.kind === 'owner' ? 'responsible for objective ' : 'one of those responsible for objective ') + n.rank
+    : (n.kind === 'owner' ? 'ответственный за цель №' : 'один из тех, кто отвечает за цель №') + n.rank) +
+    (n.statement ? ' (' + (en ? '“' : '«') + esc(n.statement) + (en ? '”' : '»') + ')' : ''));
+  return en
+    ? 'In the company’s objectives you are named as ' + items.join('; ') + '. Your profile from this test will appear in the feasibility report the client sees, next to the team’s profile. The client sees other participants’ answers only in the group summary.'
+    : 'В паспорте целей компании вы указаны как ' + items.join('; ') + '. Ваш профиль по этому тесту войдёт в отчёт об исполнимости, который видит заказчик, — рядом с профилем команды. Ответы остальных участников заказчик видит только в общем срезе.';
+}
+
 async function verifyCode() {
   const code = document.getElementById('code-input').value.trim().toUpperCase();
   if (!code || code.length < 6) {
@@ -582,6 +598,11 @@ async function verifyCode() {
       // как показать интро, — иначе участник увидит смесь языков.
       applyLanguage(data.language || 'ru');
       applyObjective();
+      const notice = Array.isArray(data.owner_notice) ? data.owner_notice : [];
+      if (notice.length) {
+        const it = document.getElementById('intro-text');
+        if (it) it.innerHTML += '<br><br><b>' + ownerNoticeHtml(notice, LANG) + '</b>';
+      }
       if (OBJECTIVE) {
         const it = document.getElementById('intro-text');
         if (it) it.innerHTML += (LANG === 'en')
