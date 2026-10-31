@@ -151,7 +151,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
     </div>
     <label style="display:flex;gap:10px;align-items:flex-start;text-align:left;margin:16px 0;font-size:13px;color:var(--ink-soft)">
       <input type="checkbox" id="nsr-consent" style="margin-top:3px;width:17px;height:17px;flex-shrink:0">
-      <span id="consent-text">Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
+      <span id="consent-text">Я согласен(а) на обработку моих ответов в исследовательских целях и для повышения эффективности Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
     </label>
     <div id="nsr-consent-err" style="display:none;color:#c0392b;font-size:13px;margin-bottom:8px">Необходимо согласие для продолжения</div>
     <button class="btn-start" id="btn-start" onclick="startForm()">Начать</button>
@@ -240,7 +240,7 @@ const CONTENT = {
       intro_text: '13 вопросов о вашем опыте в компании — прошлом, настоящем и будущем.<br>Нет правильных или неправильных ответов. Пишите первое что приходит.',
       badge_1: '① Прошлое · 4 вопроса', badge_2: '② Настоящее · 6 вопросов', badge_3: '③ Будущее · 3 вопроса',
       intro_time: 'Ориентировочное время — 10–15 минут',
-      consent_text: "Я согласен(а) на обработку моих ответов в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.",
+      consent_text: "Я согласен(а) на обработку моих ответов в исследовательских целях и для повышения эффективности Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.",
       consent_err: 'Необходимо согласие для продолжения',
       btn_start: 'Начать',
       q_num: 'Вопрос {n} из 13',
@@ -278,7 +278,7 @@ const CONTENT = {
       intro_text: '13 questions about your experience in the company — past, present and future.<br>There are no right or wrong answers. Write the first thing that comes to mind.',
       badge_1: '① Past · 4 questions', badge_2: '② Present · 6 questions', badge_3: '③ Future · 3 questions',
       intro_time: 'Approximate time — 10–15 minutes',
-      consent_text: "I consent to the processing of my answers for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. See the Privacy Policy for details. I know that I can withdraw my consent and request deletion.",
+      consent_text: "I consent to the processing of my answers for research purposes and to improve effectiveness, by Association de l'Intelligence Narrative® in accordance with GDPR. See the Privacy Policy for details. I know that I can withdraw my consent and request deletion.",
       consent_err: 'Consent is required to continue',
       btn_start: 'Start',
       q_num: 'Question {n} of 13',
@@ -562,8 +562,8 @@ function ownerNoticeHtml(list, lang) {
     : (n.kind === 'owner' ? 'ответственный за цель №' : 'один из тех, кто отвечает за цель №') + n.rank) +
     (n.statement ? ' (' + (en ? '“' : '«') + esc(n.statement) + (en ? '”' : '»') + ')' : ''));
   return en
-    ? 'In the company’s objectives you are named as ' + items.join('; ') + '. Your profile from this test will appear in the feasibility report the client sees, next to the team’s profile. The client sees other participants’ answers only in the group summary.'
-    : 'В паспорте целей компании вы указаны как ' + items.join('; ') + '. Ваш профиль по этому тесту войдёт в отчёт об исполнимости, который видит заказчик, — рядом с профилем команды. Ответы остальных участников заказчик видит только в общем срезе.';
+    ? 'In the company’s objectives you are named as ' + items.join('; ') + '. Your profile from this test will appear in the feasibility report the client sees, next to the team’s profile.'
+    : 'В паспорте целей компании вы указаны как ' + items.join('; ') + '. Ваш профиль по этому тесту войдёт в отчёт об исполнимости, который видит заказчик, — рядом с профилем команды.';
 }
 
 async function verifyCode() {
