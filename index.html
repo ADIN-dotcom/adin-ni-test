@@ -282,7 +282,7 @@ p{color:var(--ink-soft);font-size:15px}
     <!-- Поле «религия» удалено: данные особой категории (ст. 9 GDPR). -->
     <label class="consent">
       <input type="checkbox" id="r-consent">
-      <span id="consent-text">Я согласен(а) на обработку моих ответов и указанных данных в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
+      <span id="consent-text">Я согласен(а) на обработку моих ответов и указанных данных в исследовательских целях и для повышения эффективности Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.</span>
     </label>
     <div id="r-consent-e" class="errmsg">Необходимо согласие для продолжения</div>
     <div style="text-align:right;margin-top:20px">
@@ -453,7 +453,7 @@ const CONTENT = {
       lbl_name: "Имя", lbl_email: "Email",
       name_placeholder: "Ваше имя", name_err: "Введите имя",
       email_placeholder: "you@example.com", email_err: "Введите корректный email",
-      consent_text: "Я согласен(а) на обработку моих ответов и указанных данных в исследовательских целях Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.",
+      consent_text: "Я согласен(а) на обработку моих ответов и указанных данных в исследовательских целях и для повышения эффективности Association de l'Intelligence Narrative® согласно GDPR. Подробнее — в Политике конфиденциальности. Я знаю о праве отозвать согласие и потребовать удаления.",
       consent_err: "Необходимо согласие для продолжения",
       btn_start_test: "Начать тест →",
       b1_label: "Блок 1 · Стиль мышления",
@@ -598,7 +598,7 @@ const CONTENT = {
       lbl_name: "Name", lbl_email: "Email",
       name_placeholder: "Your name", name_err: "Please enter your name",
       email_placeholder: "you@example.com", email_err: "Please enter a valid email address",
-      consent_text: "I consent to the processing of my answers and the data I provide for research purposes by Association de l'Intelligence Narrative® in accordance with GDPR. Data is processed by our service providers, including outside the EU, with appropriate safeguards; see the Privacy Policy. I can withdraw consent and request deletion.",
+      consent_text: "I consent to the processing of my answers and the data I provide for research purposes and to improve effectiveness, by Association de l'Intelligence Narrative® in accordance with GDPR. Data is processed by our service providers, including outside the EU, with appropriate safeguards; see the Privacy Policy. I can withdraw consent and request deletion.",
       consent_err: "Consent is required to continue",
       btn_start_test: "Start the test →",
       b1_label: "Block 1 · Thinking Style",
@@ -910,8 +910,8 @@ function ownerNoticeHtml(list, lang) {
     : (n.kind === 'owner' ? 'ответственный за цель №' : 'один из тех, кто отвечает за цель №') + n.rank) +
     (n.statement ? ' (' + (en ? '“' : '«') + esc(n.statement) + (en ? '”' : '»') + ')' : ''));
   return en
-    ? 'In the company’s objectives you are named as ' + items.join('; ') + '. Your profile from this test will appear in the feasibility report the client sees, next to the team’s profile. The client sees other participants’ answers only in the group summary.'
-    : 'В паспорте целей компании вы указаны как ' + items.join('; ') + '. Ваш профиль по этому тесту войдёт в отчёт об исполнимости, который видит заказчик, — рядом с профилем команды. Ответы остальных участников заказчик видит только в общем срезе.';
+    ? 'In the company’s objectives you are named as ' + items.join('; ') + '. Your profile from this test will appear in the feasibility report the client sees, next to the team’s profile.'
+    : 'В паспорте целей компании вы указаны как ' + items.join('; ') + '. Ваш профиль по этому тесту войдёт в отчёт об исполнимости, который видит заказчик, — рядом с профилем команды.';
 }
 
 async function ownerNoticeOk() {
