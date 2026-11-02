@@ -13,7 +13,7 @@
           "v": "B"
         },
         {
-          "t": "I say out loud what everyone is silent about — without that the conversation won't move",
+          "t": "The first thing I see is what everyone is silent about",
           "v": "C"
         },
         {
@@ -31,7 +31,7 @@
           "v": "B"
         },
         {
-          "t": "I immediately see where the promise and the reality diverge — and I want to clear that up",
+          "t": "I immediately see where the promise and the reality diverge",
           "v": "C"
         },
         {
@@ -49,7 +49,7 @@
       "text": "A friend tells you about a difficult situation in their life. You:",
       "opts": [
         {
-          "t": "I notice they are steering around the main thing — and I name it gently",
+          "t": "I notice they are steering around the main thing",
           "v": "C"
         },
         {
@@ -83,7 +83,7 @@
           "v": "B"
         },
         {
-          "t": "I see specific mistakes that could have been avoided — and that will likely happen again",
+          "t": "I see where the meeting drifted from what it was called for",
           "v": "C"
         }
       ]
@@ -101,7 +101,7 @@
           "v": "B"
         },
         {
-          "t": "What was obvious in this situation but that everyone preferred not to notice",
+          "t": "Where one part of this story does not add up with another",
           "v": "C"
         },
         {
@@ -119,7 +119,7 @@
           "v": "B"
         },
         {
-          "t": "Check which assumptions behind the options are left unnamed — those are usually what fail",
+          "t": "Check which assumptions behind the options are left unnamed",
           "v": "C"
         },
         {
@@ -137,7 +137,7 @@
       "text": "A conflict has come up among friends or in your family. Your role in it:",
       "opts": [
         {
-          "t": "I name what others avoid saying out loud — even if it's uncomfortable",
+          "t": "I see the thing everyone is circling around",
           "v": "C"
         },
         {
@@ -189,7 +189,7 @@
           "v": "B"
         },
         {
-          "t": "I see what could have been done better — and what got in the way of that",
+          "t": "I see where the result diverged from the intention",
           "v": "C"
         },
         {
@@ -225,7 +225,7 @@
       "text": "You're preparing for an important conversation. You spend most of your time on:",
       "opts": [
         {
-          "t": "Preparing arguments about what's going wrong and why it matters to change it",
+          "t": "Working out where the positions actually diverge",
           "v": "C"
         },
         {
@@ -259,7 +259,7 @@
           "v": "B"
         },
         {
-          "t": "I check how honest this feedback is and whether it contradicts other facts",
+          "t": "I check whether it adds up with what I know from elsewhere",
           "v": "C"
         }
       ]
@@ -277,7 +277,7 @@
           "v": "B"
         },
         {
-          "t": "I say plainly where the plan didn't add up from the start — so the next one doesn't repeat it",
+          "t": "I see where the plan stopped adding up with what was happening",
           "v": "C"
         },
         {
@@ -295,7 +295,7 @@
           "v": "B"
         },
         {
-          "t": "I go where the experts disagree — that's where you see what is actually still unsettled",
+          "t": "I go where the experts disagree",
           "v": "C"
         },
         {
@@ -313,7 +313,7 @@
       "text": "In a conversation, you notice the other person is saying one thing but means another. You:",
       "opts": [
         {
-          "t": "I name the contradiction directly — it matters for an honest conversation",
+          "t": "I see the contradiction itself more sharply than the words said",
           "v": "C"
         },
         {
@@ -347,7 +347,7 @@
           "v": "B"
         },
         {
-          "t": "I first separate what is easy to confuse — otherwise the idea lands on the wrong footing",
+          "t": "I first separate what is easy to confuse",
           "v": "C"
         }
       ]
@@ -383,7 +383,7 @@
           "v": "B"
         },
         {
-          "t": "Clarity about exactly what went wrong and what needs to change",
+          "t": "Clarity about what exactly is not working right now",
           "v": "C"
         },
         {
@@ -435,7 +435,7 @@
           "v": "B"
         },
         {
-          "t": "What's actually behind this success",
+          "t": "What is missing from this account for the picture to add up",
           "v": "C"
         }
       ]
@@ -453,7 +453,7 @@
           "v": "B"
         },
         {
-          "t": "With whatever could be read two ways — I remove the places where the meaning can be swapped",
+          "t": "With whatever could be read two ways",
           "v": "C"
         },
         {
@@ -471,7 +471,7 @@
           "v": "B"
         },
         {
-          "t": "I say plainly that the direction is wrong — and explain why",
+          "t": "I say plainly that the direction is wrong",
           "v": "C"
         },
         {
@@ -489,7 +489,7 @@
       "text": "You find out that someone you trusted acted dishonestly. Your first reaction:",
       "opts": [
         {
-          "t": "This confirms what I'd noticed — and what should have been named sooner",
+          "t": "I see how far this is from what they said about themselves",
           "v": "C"
         },
         {
