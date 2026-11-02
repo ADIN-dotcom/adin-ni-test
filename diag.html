@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Проверка связи · ADIN</title>
+<!--
+  Диагностическая страница для участников: открывается по ссылке, когда
+  человек говорит «тест не грузится», и сама показывает, где именно обрыв.
+
+  Проверки идут в том порядке, в котором воспроизводится реальный отказ из
+  части сетей РФ: сначала мелкий файл, затем файл больше 16 КБ (там рвалось),
+  и сразу после него — запрос к серверу, потому что по жалобам после крупной
+  загрузки зависали даже мелкие запросы.
+
+  Запрос к серверу намеренно идёт на несуществующий путь /api/__diag: ответ
+  404 означает, что цепочка «браузер → сайт → прокси → сервер» целиком
+  работает, при этом не задействованы ни коды доступа, ни ограничитель
+  попыток (у проверки кода лимит 20 неудач на адрес за 15 минут — сжигать
+  его диагностикой нельзя).
+
+  Страница ничего не отправляет наружу и не хранит. Никаких внешних библиотек:
+  она должна открываться там, где остальное уже не открывается.
+-->
+<style>
+  :root{
+    --cream:#f8f6f0; --cream-d:#ede8df; --navy:#1e3a5f; --ink:#2b2b2b;
+    --ink-soft:#5a5a5a; --ink-faint:#8a8a8a; --green:#2d6a4f; --green-s:#d8ede4;
+    --red:#c8432a; --red-s:#fdeae6; --gold:#c9a84c; --gold-s:#f6efd9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 48px;background:var(--cream);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif}
+  .wrap{max-width:620px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 6px;color:var(--navy)}
+  .lead{color:var(--ink-soft);margin:0 0 22px}
+  .verdict{padding:16px 18px;border-radius:10px;margin-bottom:22px;line-height:1.55}
+  .verdict.ok{background:var(--green-s);border-left:4px solid var(--green)}
+  .verdict.bad{background:var(--red-s);border-left:4px solid var(--red)}
+  .verdict.wait{background:var(--gold-s);border-left:4px solid var(--gold)}
+  .verdict b{display:block;margin-bottom:4px}
+  .row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream-d)}
+  .row:last-child{border-bottom:0}
+  .mark{flex:0 0 22px;font-size:17px;line-height:1.4;text-align:center}
+  .name{font-weight:600}
+  .note{color:var(--ink-faint);font-size:13.5px;margin-top:2px}
+  .time{margin-left:auto;color:var(--ink-faint);font-size:13px;white-space:nowrap;padding-left:10px}
+  .card{background:#fff;border:1px solid var(--cream-d);border-radius:10px;padding:6px 18px}
+  .tech{margin-top:24px}
+  .tech summary{cursor:pointer;color:var(--ink-soft);font-size:14px}
+  pre{background:#fff;border:1px solid var(--cream-d);border-radius:8px;padding:12px;
+    font-size:12.5px;white-space:pre-wrap;word-break:break-word;margin:10px 0 0}
+  button{font:inherit;padding:9px 16px;border-radius:8px;border:1px solid var(--navy);
+    background:var(--navy);color:#fff;cursor:pointer;margin-top:12px}
+  button.ghost{background:transparent;color:var(--navy)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Проверка связи</h1>
+  <p class="lead">Эта страница сама проверит, доходит ли до вас тест. Ничего нажимать не нужно — подождите несколько секунд.</p>
+
+  <div id="verdict" class="verdict wait"><b>Проверяем…</b>Обычно это занимает до пятнадцати секунд.</div>
+
+  <div class="card" id="rows"></div>
+
+  <details class="tech">
+    <summary>Технические подробности — для того, кто вам помогает</summary>
+    <pre id="tech">—</pre>
+    <div class="btns">
+      <button id="copy">Скопировать для поддержки</button>
+      <button id="again" class="ghost">Проверить ещё раз</button>
+    </div>
+  </details>
+</div>
+
+<script>
+// Проверки описаны данными, а не кодом: порядок важен и должен читаться сверху вниз.
+const CHECKS = [
+  { id: 'page',  name: 'Страница открылась',
+    note: 'Значит, сам сайт до вас доходит',
+    run: async () => ({ ok: true, info: location.host }) },
+
+  { id: 'small', name: 'Небольшой файл',
+    note: 'Картинка, несколько килобайт',
+    run: () => download('logo.png') },
+
+  { id: 'big',   name: 'Файл побольше',
+    note: 'Около 27 КБ — на этом месте связь рвётся чаще всего',
+    run: () => download('questions_export.json') },
+
+  { id: 'api',   name: 'Связь с сервером',
+    note: 'Тот же путь, которым тест проверяет ваш код',
+    run: async () => {
+      const r = await timed('/api/__diag');
+      // Любой ответ сервера означает, что цепочка целая. Проверяемый путь
+      // не существует намеренно, поэтому 404 — это успех, а не ошибка.
+      return { ok: true, ms: r.ms, info: 'ответ сервера: ' + r.status };
+    } },
+
+  { id: 'api2',  name: 'Повторный запрос к серверу',
+    note: 'По жалобам после крупной загрузки зависали даже мелкие запросы',
+    run: async () => {
+      const r = await timed('/api/__diag');
+      return { ok: true, ms: r.ms, info: 'ответ сервера: ' + r.status };
+    } },
+];
+
+const TIMEOUT_MS = 20000;
+
+async function timed(url) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const t0 = performance.now();
+  try {
+    const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'nc=' + Date.now(),
+                            { signal: ctrl.signal, cache: 'no-store' });
+    const body = await res.arrayBuffer();           // дочитываем до конца: обрыв ловится здесь
+    return { status: res.status, bytes: body.byteLength, ms: Math.round(performance.now() - t0) };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function download(path) {
+  const r = await timed(path);
+  if (r.status >= 400) return { ok: false, ms: r.ms, info: 'сервер ответил ' + r.status };
+  return { ok: true, ms: r.ms, info: Math.round(r.bytes / 1024 * 10) / 10 + ' КБ' };
+}
+
+const results = [];
+
+function render() {
+  document.getElementById('rows').innerHTML = CHECKS.map(c => {
+    const r = results.find(x => x.id === c.id);
+    const mark = !r ? '<span style="color:var(--ink-faint)">·</span>'
+               : r.ok ? '<span style="color:var(--green)">✓</span>'
+                      : '<span style="color:var(--red)">✕</span>';
+    const time = r && r.ms != null ? r.ms + ' мс' : '';
+    const note = r && r.info ? c.note + ' · ' + r.info : c.note;
+    return `<div class="row"><div class="mark">${mark}</div>
+      <div><div class="name">${c.name}</div><div class="note">${note}</div></div>
+      <div class="time">${time}</div></div>`;
+  }).join('');
+}
+
+function verdict() {
+  const failed = results.filter(r => !r.ok);
+  const el = document.getElementById('verdict');
+  if (!failed.length) {
+    el.className = 'verdict ok';
+    el.innerHTML = '<b>Связь в порядке</b>Всё, что нужно тесту, до вас доходит. ' +
+      'Если тест всё равно не открывается — закройте вкладку и откройте ссылку заново; ' +
+      'если не поможет, пришлите подробности из раздела ниже.';
+    return;
+  }
+  const names = failed.map(f => CHECKS.find(c => c.id === f.id).name.toLowerCase()).join(', ');
+  el.className = 'verdict bad';
+  el.innerHTML = '<b>Связь обрывается</b>Не прошло: ' + names + '. ' +
+    'Чаще всего помогает сменить сеть — например, с домашнего Wi-Fi на мобильный интернет ' +
+    'или наоборот. Если не помогает, нажмите «Скопировать для поддержки» ниже и пришлите текст тому, кто дал вам ссылку.';
+}
+
+function tech() {
+  const lines = [
+    'Проверка связи ADIN',
+    'время: ' + new Date().toString(),
+    'адрес: ' + location.href,
+    'браузер: ' + navigator.userAgent,
+    'язык: ' + navigator.language + ' · экран: ' + screen.width + '×' + screen.height,
+    '',
+    ...results.map(r => {
+      const c = CHECKS.find(x => x.id === r.id);
+      return (r.ok ? 'OK   ' : 'СБОЙ ') + c.name +
+             (r.ms != null ? ' · ' + r.ms + ' мс' : '') +
+             (r.info ? ' · ' + r.info : '');
+    }),
+  ];
+  document.getElementById('tech').textContent = lines.join('\n');
+}
+
+async function runAll() {
+  results.length = 0;
+  document.getElementById('verdict').className = 'verdict wait';
+  document.getElementById('verdict').innerHTML = '<b>Проверяем…</b>Обычно это занимает до пятнадцати секунд.';
+  render();
+  for (const c of CHECKS) {
+    let r;
+    try {
+      r = await c.run();
+    } catch (e) {
+      // Прерывание по таймауту и сетевой отказ выглядят для участника одинаково,
+      // но для поддержки разница важна — поэтому причина сохраняется как есть.
+      r = { ok: false, info: e.name === 'AbortError'
+            ? 'не ответило за ' + (TIMEOUT_MS / 1000) + ' с' : 'ошибка сети: ' + e.message };
+    }
+    results.push({ id: c.id, ...r });
+    render();
+  }
+  verdict();
+  tech();
+}
+
+document.getElementById('again').onclick = runAll;
+document.getElementById('copy').onclick = async () => {
+  const btn = document.getElementById('copy');
+  const text = document.getElementById('tech').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = 'Скопировано';
+  } catch (e) {
+    // В части браузеров буфер недоступен без доверенного контекста — тогда
+    // выделяем текст, чтобы человек скопировал вручную.
+    const r = document.createRange();
+    r.selectNodeContents(document.getElementById('tech'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    btn.textContent = 'Выделено — скопируйте вручную';
+  }
+  setTimeout(() => { btn.textContent = 'Скопировать для поддержки'; }, 2500);
+};
+
+runAll();
+</script>
+</body>
+</html>
