@@ -489,7 +489,7 @@
       "text": "You find out that someone you trusted acted dishonestly. Your first reaction:",
       "opts": [
         {
-          "t": "This confirms what I'd noticed — and what should have been named sooner",
+          "t": "I go back over what they said before and see what did not add up",
           "v": "C"
         },
         {
